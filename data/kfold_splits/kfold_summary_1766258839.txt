@@ -1,0 +1,53 @@
+============================================================
+K-Fold Cross-Validation Split Summary
+============================================================
+
+Total Folds: 5
+Created at: 2025-12-20 19:27:20
+
+FOLD_1:
+----------------------------------------
+  Training Set:
+    Total: 8352
+    Distribution: {'HGG': 4032, 'LGG': 4320}
+  Validation Set:
+    Total: 2088
+    Distribution: {'HGG': 1008, 'LGG': 1080}
+
+FOLD_2:
+----------------------------------------
+  Training Set:
+    Total: 8352
+    Distribution: {'HGG': 4032, 'LGG': 4320}
+  Validation Set:
+    Total: 2088
+    Distribution: {'HGG': 1008, 'LGG': 1080}
+
+FOLD_3:
+----------------------------------------
+  Training Set:
+    Total: 8352
+    Distribution: {'HGG': 4032, 'LGG': 4320}
+  Validation Set:
+    Total: 2088
+    Distribution: {'HGG': 1008, 'LGG': 1080}
+
+FOLD_4:
+----------------------------------------
+  Training Set:
+    Total: 8352
+    Distribution: {'HGG': 4032, 'LGG': 4320}
+  Validation Set:
+    Total: 2088
+    Distribution: {'HGG': 1008, 'LGG': 1080}
+
+FOLD_5:
+----------------------------------------
+  Training Set:
+    Total: 8352
+    Distribution: {'HGG': 4032, 'LGG': 4320}
+  Validation Set:
+    Total: 2088
+    Distribution: {'HGG': 1008, 'LGG': 1080}
+
+============================================================

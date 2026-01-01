@@ -1,0 +1,64 @@
+# Data directories (large files, not tracked)
+data/raw/
+data/processed/
+data/brats2018/
+
+# Logs
+logs/
+*.log
+
+# Checkpoints and model weights
+checkpoints/
+models/*.pth
+models/*.pt
+models/*.ckpt
+*.pth
+*.pt
+*.ckpt
+
+# Experiment outputs
+experiments/*/
+results/*/
+outputs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Keep structure but ignore contents
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!logs/.gitkeep
+!checkpoints/.gitkeep
+

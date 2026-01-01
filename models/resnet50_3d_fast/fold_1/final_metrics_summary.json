@@ -1,0 +1,7 @@
+{
+  "best_validation_accuracy": 1.0,
+  "best_validation_loss": 0.09218589567590034,
+  "total_epochs": 7,
+  "final_train_accuracy": 0.9939,
+  "final_val_accuracy": 0.9909
+}

@@ -1,0 +1,38 @@
+# Stage 2: Z-score Normalization Configuration
+# BraTS2018 3D NIfTI preprocessing pipeline
+
+paths:
+  # Project root (persistent workspace)
+  project_root: /workspace/brain_tumor_project
+  
+  # Input data root (Stage 1 outputs: N4 corrected volumes)
+  input_root: data/processed/stage_1_n4
+  
+  # Output root for processed data
+  output_root: data/processed/stage_2_zscore
+  
+  # Log directory
+  log_dir: logs/preprocessing/stage_2_zscore
+  
+  # Manifest file (JSONL format) for resumability
+  manifest_file: manifest.jsonl
+
+# Z-score Normalization parameters
+zscore_parameters:
+  # Epsilon value to avoid division by zero (small constant added to std)
+  eps: 1e-8
+
+# Processing settings
+processing:
+  # Modalities to process (segmentation masks are NOT processed)
+  modalities: [t1, t1ce, t2, flair]
+  
+  # Output format (nii.gz recommended for compression)
+  output_format: .nii.gz
+  
+  # Default worker count (overridden by CLI --workers argument)
+  default_workers: auto
+
+# Logging
+log_level: INFO
+

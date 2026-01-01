@@ -1,0 +1,44 @@
+# Stage 1: N4 Bias Field Correction Configuration
+# BraTS2018 3D NIfTI preprocessing pipeline
+
+paths:
+  # Project root (persistent workspace)
+  project_root: /workspace/brain_tumor_project
+  
+  # Input data root (BraTS2018 dataset)
+  data_root: data/brats2018
+  
+  # Output root for processed data
+  output_root: data/processed/stage_1_n4
+  
+  # Log directory
+  log_dir: logs/preprocessing/stage_1_n4
+  
+  # Manifest file (JSONL format) for resumability
+  manifest_file: manifest.jsonl
+
+# N4 Bias Field Correction parameters
+n4_parameters:
+  # Maximum iterations per resolution level (multi-resolution approach)
+  max_iterations: [40, 40, 30, 20]
+  
+  # Number of control points for B-spline fitting (4x4x4 grid)
+  num_control_points: 4
+  
+  # Convergence threshold
+  convergence_threshold: 0.001
+
+# Processing settings
+processing:
+  # Modalities to process (segmentation masks are NOT processed)
+  modalities: [t1, t1ce, t2, flair]
+  
+  # Output format (nii.gz recommended for compression)
+  output_format: .nii.gz
+  
+  # Default worker count (overridden by CLI --workers argument)
+  default_workers: auto
+
+# Logging
+log_level: INFO
+

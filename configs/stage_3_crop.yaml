@@ -1,0 +1,50 @@
+# Stage 3: ROI Cropping Configuration
+# BraTS2018 3D NIfTI preprocessing pipeline
+
+paths:
+  # Project root (persistent workspace)
+  project_root: /workspace/brain_tumor_project
+  
+  # Input data root (Stage 2 outputs: Z-score normalized volumes)
+  input_root: data/processed/stage_2_zscore
+  
+  # Output root for processed data
+  output_root: data/processed/stage_3_crop
+  
+  # Log directory
+  log_dir: logs/preprocessing/stage_3_crop
+  
+  # Manifest file (JSONL format) for resumability
+  manifest_file: manifest.jsonl
+
+# ROI Cropping parameters
+crop_parameters:
+  # Padding in voxels to add around bounding box (per axis)
+  padding: 10
+  
+  # Epsilon threshold for brain mask (abs(image) > eps_mask)
+  eps_mask: 1e-6
+  
+  # Bounding box computation mode:
+  #   "reference_modality": Use single reference modality (faster, default)
+  #   "union": Use union mask across all modalities (more robust)
+  bbox_mode: reference_modality
+  
+  # Reference modality for bbox_mode="reference_modality" (must be one of: t1, t1ce, t2, flair)
+  reference_modality: flair
+
+# Processing settings
+processing:
+  # Modalities to process (segmentation masks are NOT processed)
+  modalities: [t1, t1ce, t2, flair]
+  
+  # Output format (nii.gz recommended for compression)
+  output_format: .nii.gz
+  
+  # Default worker count (overridden by CLI --workers argument)
+  # Auto workers will be capped: min(max(1, cpu_count()//4), 16)
+  default_workers: auto
+
+# Logging
+log_level: INFO
+

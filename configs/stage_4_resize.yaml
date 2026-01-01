@@ -1,0 +1,42 @@
+# Stage 4: Resize Configuration
+# BraTS2018 3D NIfTI preprocessing pipeline
+
+paths:
+  # Project root (persistent workspace)
+  project_root: /workspace/brain_tumor_project
+  
+  # Input data root (Stage 3 outputs: ROI cropped volumes)
+  input_root: data/processed/stage_3_crop
+  
+  # Output root for processed data
+  output_root: data/processed/stage_4_resize
+  
+  # Log directory
+  log_dir: logs/preprocessing/stage_4_resize
+  
+  # Manifest file (JSONL format) for resumability
+  manifest_file: manifest.jsonl
+
+# Resize parameters
+resize_parameters:
+  # Target size for resized volumes (x, y, z)
+  target_size: [128, 128, 128]
+  
+  # Interpolation method (linear recommended for MRI intensities)
+  interpolation: linear
+
+# Processing settings
+processing:
+  # Modalities to process (segmentation masks are NOT processed)
+  modalities: [t1, t1ce, t2, flair]
+  
+  # Output format (nii.gz recommended for compression)
+  output_format: .nii.gz
+  
+  # Default worker count (overridden by CLI --workers argument)
+  # Auto workers will be capped: min(max(1, cpu_count()//4), 16)
+  default_workers: auto
+
+# Logging
+log_level: INFO
+
