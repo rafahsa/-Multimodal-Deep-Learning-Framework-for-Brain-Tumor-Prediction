@@ -16,18 +16,20 @@ Requirements:
 Author: Medical Imaging Pipeline
 """
 
+from __future__ import annotations
+
 from typing import Optional, Tuple
 
 try:
     from monai.transforms import (
         Compose,
-        RandRotate,
-        RandFlip,
-        RandZoom,
-        RandAffine,
-        ToTensor,
-        EnsureChannelFirst,
-        NormalizeIntensity,
+        RandRotateD,
+        RandFlipD,
+        RandZoomD,
+        RandAffineD,
+        ToTensorD,
+        EnsureChannelFirstD,
+        NormalizeIntensityD,
     )
     MONAI_AVAILABLE = True
 except ImportError:
@@ -36,12 +38,13 @@ except ImportError:
 
 
 def get_train_transforms_3d(
-    rotation_range: Tuple[float, float, float] = (0.26, 0.26, 0.26),  # ±15 degrees in radians
+    rotation_range: Tuple[float, float, float] = (0.2, 0.2, 0.2),  # ±11.5 degrees in radians (slightly reduced for stability)
     flip_prob: float = 0.5,
-    zoom_range: Tuple[float, float] = (0.9, 1.1),  # ±10%
-    translation_range: Tuple[float, float, float] = (0.1, 0.1, 0.1),  # ±10% of size
-    prob: float = 0.5,
-    spatial_dims: int = 3
+    zoom_range: Tuple[float, float] = (0.92, 1.08),  # ±8% (slightly reduced for stability)
+    translation_range: Tuple[float, float, float] = (0.08, 0.08, 0.08),  # ±8% of size (slightly reduced)
+    prob: float = 0.6,  # Increased probability for more augmentation
+    spatial_dims: int = 3,
+    num_channels: int = 1  # Number of input channels (1 for single-modality, 4 for multi-modality)
 ) -> Compose:
     """
     Get training augmentation transforms for 3D medical imaging.
@@ -69,74 +72,92 @@ def get_train_transforms_3d(
         >>> augmented_volume = transforms(volume_dict)
     """
     if not MONAI_AVAILABLE:
-        raise ImportError(
-            "MONAI is required for augmentation. Install with: pip install monai"
-        )
+        raise ImportError("MONAI is required for augmentation. Install with: pip install monai")
     
-    transforms = [
-        # Ensure channel dimension is first (required for MONAI)
-        EnsureChannelFirst(channel_dim='no_channel'),  # Adds channel dim if missing
-        
+    transforms = []
+    
+    # Ensure channel dimension is first (required for MONAI)
+    # For single-modality (1 channel), add channel dim if missing
+    # For multi-modal (4 channels), channels are ALREADY first from dataset (4, D, H, W)
+    # DO NOT apply EnsureChannelFirstD for multi-modal - it would incorrectly rearrange dimensions
+    if num_channels == 1:
+        # Single modality: add channel dim if missing (for 3D: (D,H,W) -> (1,D,H,W))
+        transforms.append(EnsureChannelFirstD(keys='image', channel_dim='no_channel'))
+    else:
+        # Multi-modal: channels are already first (4, D, H, W) from dataset
+        # Skip EnsureChannelFirstD to preserve correct channel order
+        # MONAI transforms work correctly with channels-first format
+        pass
+    
+    # Add augmentation transforms
+    transforms.extend([
         # Random rotation (±15 degrees ≈ 0.26 radians)
         # Rotates around x, y, z axes independently
-        RandRotate(
+        RandRotateD(
+            keys='image',
             range_x=rotation_range[0],
             range_y=rotation_range[1],
             range_z=rotation_range[2],
             prob=prob,
             keep_size=True,  # Maintain output size
             mode='bilinear',  # Bilinear interpolation for smooth rotation
-            padding_mode='zeros'  # Zero-padding for boundaries
+            padding_mode='constant'  # Constant padding (zeros) for boundaries
         ),
         
         # Random flip along x-axis
-        RandFlip(
+        RandFlipD(
+            keys='image',
             spatial_axis=0,
             prob=flip_prob
         ),
         
         # Random flip along y-axis
-        RandFlip(
+        RandFlipD(
+            keys='image',
             spatial_axis=1,
             prob=flip_prob
         ),
         
         # Random flip along z-axis
-        RandFlip(
+        RandFlipD(
+            keys='image',
             spatial_axis=2,
             prob=flip_prob
         ),
         
         # Random zoom (±10%)
-        RandZoom(
+        RandZoomD(
+            keys='image',
             min_zoom=zoom_range[0],
             max_zoom=zoom_range[1],
             prob=prob,
             mode='trilinear',  # Trilinear interpolation for 3D
-            padding_mode='zeros',
+            padding_mode='constant',  # Constant padding (zeros) for boundaries
             keep_size=True  # Crop/pad to maintain size
         ),
         
         # Random translation (±10% of volume size)
         # Combined with rotation for more realistic augmentation
-        RandAffine(
+        RandAffineD(
+            keys='image',
             prob=prob,
             translate_range=translation_range,
             mode='bilinear',
-            padding_mode='zeros',
+            padding_mode='constant',  # Constant padding (zeros) for boundaries
             spatial_size=None  # Keep original size
         ),
         
         # Convert to tensor (required for PyTorch)
-        ToTensor(dtype=None)  # Preserves original dtype
-    ]
+        ToTensorD(keys='image', dtype=None)  # Preserves original dtype
+    ])
     
     return Compose(transforms)
 
 
 def get_val_transforms_3d(
     normalize: bool = True,
-    spatial_dims: int = 3
+    spatial_dims: int = 3,
+    num_channels: int = 1  # Number of input channels (1 for single-modality, 4 for multi-modality)
 ) -> Compose:
     """
     Get validation/test transforms (NO augmentation).
@@ -150,6 +171,7 @@ def get_val_transforms_3d(
         normalize: Whether to apply intensity normalization
                    (default: True, but Stage 2 already normalized)
         spatial_dims: Number of spatial dimensions (3 for 3D)
+        num_channels: Number of input channels (1 for single-modality, 4 for multi-modality)
         
     Returns:
         MONAI Compose transform pipeline (no augmentation)
@@ -163,17 +185,27 @@ def get_val_transforms_3d(
             "MONAI is required for transforms. Install with: pip install monai"
         )
     
-    transforms = [
-        # Ensure channel dimension is first
-        EnsureChannelFirst(channel_dim='no_channel'),
-        
-        # Convert to tensor
-        ToTensor(dtype=None)
-    ]
+    transforms = []
+    
+    # Ensure channel dimension is first
+    # For single-modality (1 channel), add channel dim if missing
+    # For multi-modal (4 channels), channels are ALREADY first from dataset (4, D, H, W)
+    # DO NOT apply EnsureChannelFirstD for multi-modal - it would incorrectly rearrange dimensions
+    if num_channels == 1:
+        # Single modality: add channel dim if missing (for 3D: (D,H,W) -> (1,D,H,W))
+        transforms.append(EnsureChannelFirstD(keys='image', channel_dim='no_channel'))
+    else:
+        # Multi-modal: channels are already first (4, D, H, W) from dataset
+        # Skip EnsureChannelFirstD to preserve correct channel order
+        # MONAI transforms work correctly with channels-first format
+        pass
     
     # Optional normalization (usually not needed if Stage 2 already normalized)
     if normalize:
-        transforms.insert(-1, NormalizeIntensity(subtrahend=0.0, divisor=1.0))
+        transforms.append(NormalizeIntensityD(keys='image', subtrahend=0.0, divisor=1.0))
+    
+    # Convert to tensor
+    transforms.append(ToTensorD(keys='image', dtype=None))
     
     return Compose(transforms)
 
@@ -229,7 +261,7 @@ def get_mil_transforms_3d(mode: str = "train") -> Compose:
         return get_val_transforms_3d()
 
 
-def get_resnet3d_transforms_3d(mode: str = "train") -> Compose:
+def get_resnet3d_transforms_3d(mode: str = "train", num_channels: int = 1) -> Compose:
     """
     Get transforms for ResNet50-3D models.
     
@@ -237,11 +269,17 @@ def get_resnet3d_transforms_3d(mode: str = "train") -> Compose:
     
     Args:
         mode: "train" or "val"
+        num_channels: Number of input channels (1 for single-modality, 4 for multi-modality)
         
     Returns:
         Transform pipeline
     """
-    return get_transforms_3d(mode=mode)
+    if mode == "train":
+        return get_train_transforms_3d(num_channels=num_channels)
+    elif mode == "val":
+        return get_val_transforms_3d(num_channels=num_channels)
+    else:
+        raise ValueError(f"Unknown mode: {mode}. Must be 'train' or 'val'")
 
 
 def get_swin_unetr_transforms_3d(mode: str = "train") -> Compose:
