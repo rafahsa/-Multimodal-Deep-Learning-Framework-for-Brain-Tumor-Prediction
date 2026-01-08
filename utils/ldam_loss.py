@@ -31,14 +31,18 @@ class LDAMLoss(nn.Module):
     """
     Label-Distribution-Aware Margin Loss.
     
+    For imbalanced 3D medical datasets, reduced margins and scaling improve stability:
+    - max_m=0.3 (reduced from 0.5): Prevents excessive margin penalties that cause instability
+    - s=20 (reduced from 30): Lower temperature scaling reduces gradient variance
+    
     Args:
         num_classes: Number of classes
-        max_m: Maximum margin value (default: 0.5)
-        s: Scaling factor (default: 30)
+        max_m: Maximum margin value (default: 0.3 for stability in 3D medical imaging)
+        s: Scaling factor (default: 20 for stability in 3D medical imaging)
         reduction: Loss reduction ('mean' or 'none')
     """
     
-    def __init__(self, num_classes=2, max_m=0.5, s=30, reduction='mean'):
+    def __init__(self, num_classes=2, max_m=0.3, s=20, reduction='mean'):
         super().__init__()
         self.num_classes = num_classes
         self.max_m = max_m
@@ -115,7 +119,7 @@ class LDAMLoss(nn.Module):
             raise ValueError(f"Unknown reduction: {self.reduction}")
 
 
-def compute_class_weights_drw(class_counts: List[int], drw_epoch: int, current_epoch: int):
+def compute_class_weights_drw(class_counts: List[int], drw_epoch: int, current_epoch: int, device: str = 'cuda'):
     """
     Compute class weights for DRW (Deferred Re-Weighting).
     
@@ -127,9 +131,10 @@ def compute_class_weights_drw(class_counts: List[int], drw_epoch: int, current_e
         class_counts: List of counts for each class [n_0, n_1, ...]
         drw_epoch: Epoch at which to start applying weights
         current_epoch: Current training epoch
+        device: Device for tensor ('cuda' or 'cpu')
     
     Returns:
-        class_weights: Tensor of shape (num_classes,) or None
+        class_weights: Tensor of shape (num_classes,) on specified device, or None
     """
     if current_epoch < drw_epoch:
         return None
@@ -140,14 +145,15 @@ def compute_class_weights_drw(class_counts: List[int], drw_epoch: int, current_e
     # Compute weights: sqrt(n_max / n_j)
     weights = np.sqrt(n_max / (class_counts + 1e-8))  # Add epsilon to avoid division by zero
     
-    return torch.tensor(weights, dtype=torch.float32)
+    # Create tensor directly on target device (GPU-first)
+    return torch.tensor(weights, dtype=torch.float32, device=device)
 
 
 def build_loss_fn(
     num_classes: int,
     class_counts: List[int],
-    max_m: float = 0.5,
-    s: float = 30,
+    max_m: float = 0.3,  # Reduced from 0.5 for stability in 3D medical imaging
+    s: float = 20,  # Reduced from 30 for stability in 3D medical imaging
     drw_start_epoch: int = 15,
     device: str = 'cuda'
 ):
@@ -172,26 +178,40 @@ def build_loss_fn(
     
     def loss_fn(logits: torch.Tensor, targets: torch.Tensor, epoch: int):
         """
-        Compute LDAM loss with DRW class weights.
+        Compute LDAM loss with DRW class weights (fully GPU-resident).
+        
+        All tensors remain on GPU throughout computation:
+        - logits: (batch_size, num_classes) on GPU
+        - targets: (batch_size,) on GPU
+        - class_weights_drw: (num_classes,) on GPU (if DRW active)
+        - sample_weights: (batch_size,) on GPU (if DRW active)
         
         Args:
-            logits: Classification logits (batch_size, num_classes)
-            targets: Class labels (batch_size,)
+            logits: Classification logits (batch_size, num_classes) on GPU
+            targets: Class labels (batch_size,) on GPU
             epoch: Current training epoch
         
         Returns:
-            loss: LDAM loss value
+            loss: LDAM loss value (scalar tensor on GPU)
         """
-        # Compute DRW class weights
-        class_weights_drw = compute_class_weights_drw(class_counts, drw_start_epoch, epoch)
+        # Get device from logits (ensures we use the same device)
+        device_actual = logits.device
+        
+        # Compute DRW class weights on the same device as logits/targets
+        class_weights_drw = compute_class_weights_drw(
+            class_counts, drw_start_epoch, epoch, device=device_actual
+        )
         
         if class_weights_drw is not None:
-            # Map class weights to per-sample weights
-            sample_weights = class_weights_drw[targets].to(device)
+            # Map class weights to per-sample weights (all on GPU)
+            # class_weights_drw is already on device_actual (GPU)
+            # targets is on device_actual (GPU)
+            # Indexing GPU tensor with GPU indices is safe
+            sample_weights = class_weights_drw[targets]
         else:
             sample_weights = None
         
-        # Compute LDAM loss
+        # Compute LDAM loss (all tensors on GPU)
         loss = ldam_loss(logits, targets, class_weights=sample_weights)
         
         return loss

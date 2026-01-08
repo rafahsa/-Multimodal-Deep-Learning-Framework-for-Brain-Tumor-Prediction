@@ -98,7 +98,8 @@ def get_weighted_sampler(
     strategy: str = "inverse_freq",
     num_samples: Optional[int] = None,
     replacement: bool = True,
-    generator: Optional[torch.Generator] = None
+    generator: Optional[torch.Generator] = None,
+    seed: Optional[int] = None
 ) -> WeightedRandomSampler:
     """
     Create a WeightedRandomSampler for balanced class sampling.
@@ -113,6 +114,8 @@ def get_weighted_sampler(
                     If None, uses len(labels)
         replacement: Whether to sample with replacement (required for balancing)
         generator: Optional PyTorch generator for reproducibility
+        seed: Optional random seed for reproducibility (creates generator if provided)
+              If both generator and seed are provided, generator takes precedence
         
     Returns:
         WeightedRandomSampler instance
@@ -120,7 +123,7 @@ def get_weighted_sampler(
     Example:
         >>> dataset = BraTSDataset(...)
         >>> labels = [dataset[i][1] for i in range(len(dataset))]  # Get all labels
-        >>> sampler = get_weighted_sampler(labels, strategy="inverse_freq")
+        >>> sampler = get_weighted_sampler(labels, strategy="inverse_freq", seed=42)
         >>> train_loader = DataLoader(dataset, batch_size=8, sampler=sampler)
     """
     if not TORCH_AVAILABLE:
@@ -143,6 +146,11 @@ def get_weighted_sampler(
     # Determine number of samples
     if num_samples is None:
         num_samples = len(labels)
+    
+    # Handle seed: create generator from seed if provided and generator is None
+    if generator is None and seed is not None:
+        generator = torch.Generator()
+        generator.manual_seed(seed)
     
     # Create weighted sampler
     sampler = WeightedRandomSampler(
@@ -334,7 +342,7 @@ if __name__ == "__main__":
     print(f"  (LGG has higher weight as it's the minority class)")
     
     # Create weighted sampler
-    sampler = get_weighted_sampler(labels, strategy="inverse_freq", num_samples=100)
+    sampler = get_weighted_sampler(labels, strategy="inverse_freq", num_samples=100, seed=42)
     print(f"\nCreated WeightedRandomSampler:")
     print(f"  num_samples: {sampler.num_samples}")
     print(f"  replacement: {sampler.replacement}")

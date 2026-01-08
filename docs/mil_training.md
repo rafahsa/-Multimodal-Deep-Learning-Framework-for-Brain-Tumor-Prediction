@@ -17,9 +17,10 @@ The pipeline implements:
 
 The Dual-Stream MIL model (`models/dual_stream_mil/model.py`) consists of:
 
-1. **Instance Encoder**: ResNet18 adapted for 1-channel 2D slices
+1. **Instance Encoder**: ResNet34 adapted for 1-channel 2D slices (UPGRADED from ResNet18)
    - Converts each slice to a 512-dimensional feature vector
-   - Pretrained ImageNet weights can be used (optional)
+   - Pretrained ImageNet weights used by default
+   - Richer feature representations for complex slice-level patterns
 
 2. **Stream 1: Max-Pooling Aggregation**
    - Takes maximum across all instance features
@@ -34,7 +35,9 @@ The Dual-Stream MIL model (`models/dual_stream_mil/model.py`) consists of:
 
 5. **Classifier**: Binary classification head (HGG vs LGG)
 
-**Model Size**: ~11.6M parameters
+**Model Size**: ~21.3M parameters (ResNet34 encoder)
+
+**Multi-Modality Version**: See `train_mil_multi_modal.py` for FLAIR+T1ce multi-modality MIL
 
 ### Why Dual-Stream?
 

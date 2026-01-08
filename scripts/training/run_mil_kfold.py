@@ -17,7 +17,12 @@ from datetime import datetime
 from typing import List, Dict
 
 import numpy as np
-import pandas as pd
+import csv
+try:
+    import pandas as pd
+    HAS_PANDAS = True
+except ImportError:
+    HAS_PANDAS = False
 
 
 def parse_folds(folds_str: str) -> List[int]:
@@ -130,15 +135,12 @@ def aggregate_results(output_dir: Path, folds: List[int]):
         print("ERROR: No metrics loaded")
         return
     
-    # Create DataFrame
-    df = pd.DataFrame(fold_metrics_list)
-    
-    # Compute mean and std
+    # Compute mean and std (no pandas required)
     metrics_to_aggregate = ['accuracy', 'precision', 'recall', 'f1', 'auc']
     mean_std = {}
     
     for metric in metrics_to_aggregate:
-        values = df[metric].values
+        values = [m[metric] for m in fold_metrics_list]
         mean_std[f'{metric}_mean'] = float(np.mean(values))
         mean_std[f'{metric}_std'] = float(np.std(values))
     
@@ -154,7 +156,17 @@ def aggregate_results(output_dir: Path, folds: List[int]):
         json.dump(summary_json, f, indent=2)
     
     # Save summary CSV (table)
-    df.to_csv(summary_dir / 'summary.csv', index=False)
+    csv_file = summary_dir / 'summary.csv'
+    if HAS_PANDAS:
+        df = pd.DataFrame(fold_metrics_list)
+        df.to_csv(csv_file, index=False)
+    else:
+        # Fallback: manual CSV writing
+        with open(csv_file, 'w', newline='') as f:
+            if fold_metrics_list:
+                writer = csv.DictWriter(f, fieldnames=fold_metrics_list[0].keys())
+                writer.writeheader()
+                writer.writerows(fold_metrics_list)
     
     # Save mean±std JSON
     with open(summary_dir / 'mean_std.json', 'w') as f:
