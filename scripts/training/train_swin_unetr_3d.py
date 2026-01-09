@@ -921,6 +921,7 @@ def main():
     
     best_val_auc = -np.inf
     best_val_f1 = -np.inf
+    best_epoch = 0  # Track epoch where best_val_auc was achieved (1-indexed)
     
     # DRY-RUN VERIFICATION: Load one batch and verify shapes before training
     logger.info("\n" + "="*60)
@@ -1061,6 +1062,7 @@ def main():
         if val_metrics['auc'] > best_val_auc or (val_metrics['auc'] == best_val_auc and val_metrics['f1'] > best_val_f1):
             best_val_auc = val_metrics['auc']
             best_val_f1 = val_metrics['f1']
+            best_epoch = epoch  # Track epoch where best_val_auc was achieved (1-indexed)
             
             # Update checkpoint with current best metrics before saving
             checkpoint['val_metrics'] = val_metrics  # Ensure checkpoint has latest best metrics
@@ -1201,6 +1203,24 @@ def main():
         'lr': history['lr']
     }
     
+    # Compute best_epoch and best_val_auc from training_history.val_auc
+    # This ensures checkpoint_info matches the actual best epoch (by val_auc)
+    if len(history['val_auc']) > 0:
+        val_auc_array = np.array(history['val_auc'])
+        best_epoch_idx = int(np.argmax(val_auc_array))
+        computed_best_epoch = best_epoch_idx + 1  # Convert to 1-indexed epoch
+        computed_best_val_auc = float(val_auc_array[best_epoch_idx])
+        
+        # Use computed values if they differ from tracked values (for consistency)
+        if computed_best_val_auc != best_val_auc:
+            logger.warning(f"Computed best_val_auc ({computed_best_val_auc:.6f}) differs from tracked ({best_val_auc:.6f})")
+            logger.warning(f"Using computed values from training_history for consistency")
+            best_epoch = computed_best_epoch
+            best_val_auc = computed_best_val_auc
+    else:
+        # Fallback if history is empty (should not happen)
+        logger.warning("Empty val_auc history, using tracked values")
+    
     # Add loss summary statistics
     final_metrics['loss_summary'] = {
         'train_loss': {
@@ -1216,8 +1236,8 @@ def main():
             'max': float(max(history['val_loss'])),
             'mean': float(np.mean(history['val_loss'])),
             'std': float(np.std(history['val_loss'])),
-            'best_epoch': int(early_stopping.best_epoch),
-            'best_value': float(history['val_loss'][early_stopping.best_epoch - 1]) if early_stopping.best_epoch > 0 else None
+            'best_epoch': int(best_epoch),  # Use best_epoch (by val_auc)
+            'best_value': float(history['val_loss'][best_epoch - 1]) if best_epoch > 0 and len(history['val_loss']) >= best_epoch else None
         }
     }
     
@@ -1229,15 +1249,34 @@ def main():
     }
     
     # Add checkpoint information used for final evaluation
+    # CRITICAL: best_epoch and best_val_auc are computed from training_history.val_auc
+    # to ensure consistency with the actual best performing epoch
     final_metrics['checkpoint_info'] = {
         'checkpoint_path': str(checkpoint_path),
         'checkpoint_name': checkpoint_path.name,
         'checkpoint_epoch': int(checkpoint_epoch) if isinstance(checkpoint_epoch, (int, float)) else None,
         'checkpoint_val_auc': float(checkpoint_val_auc) if isinstance(checkpoint_val_auc, (int, float)) else None,
         'is_ema': bool(use_ema),
-        'best_epoch': int(early_stopping.best_epoch),
-        'best_val_auc': float(early_stopping.best_score)
+        'best_epoch': int(best_epoch),  # Best epoch by val_auc from training_history
+        'best_val_auc': float(best_val_auc)  # Best val_auc from training_history
     }
+    
+    # Update top-level metrics to use values from best epoch (by val_auc)
+    # This ensures metrics.json top-level metrics match the best epoch performance
+    if best_epoch > 0 and len(history['val_acc']) >= best_epoch:
+        best_epoch_idx = best_epoch - 1  # Convert to 0-indexed
+        final_metrics['accuracy'] = float(history['val_acc'][best_epoch_idx])
+        if len(history['val_precision']) > best_epoch_idx:
+            final_metrics['precision'] = float(history['val_precision'][best_epoch_idx])
+        if len(history['val_recall']) > best_epoch_idx:
+            final_metrics['recall'] = float(history['val_recall'][best_epoch_idx])
+        if len(history['val_f1']) > best_epoch_idx:
+            final_metrics['f1'] = float(history['val_f1'][best_epoch_idx])
+        final_metrics['auc'] = float(best_val_auc)  # Already computed from training_history
+        
+        logger.info(f"Updated top-level metrics from best epoch {best_epoch} (val_auc: {best_val_auc:.6f})")
+    else:
+        logger.warning(f"Could not update top-level metrics from best epoch {best_epoch} (history length: {len(history['val_acc'])})")
     
     # Save final metrics with full history
     # Convert NumPy types to JSON-serializable Python types
