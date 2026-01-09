@@ -1,0 +1,70 @@
+{
+  "accuracy": 0.8105263157894737,
+  "precision": 0.9642857142857143,
+  "recall": 0.7714285714285715,
+  "f1_score": 0.8571428571428571,
+  "auc_roc": 0.9126349206349207,
+  "confusion_matrix": [
+    [
+      69,
+      6
+    ],
+    [
+      48,
+      162
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.5897435897435898,
+      "recall": 0.92,
+      "f1-score": 0.71875,
+      "support": 75.0
+    },
+    "1": {
+      "precision": 0.9642857142857143,
+      "recall": 0.7714285714285715,
+      "f1-score": 0.8571428571428571,
+      "support": 210.0
+    },
+    "accuracy": 0.8105263157894737,
+    "macro avg": {
+      "precision": 0.777014652014652,
+      "recall": 0.8457142857142858,
+      "f1-score": 0.7879464285714286,
+      "support": 285.0
+    },
+    "weighted avg": {
+      "precision": 0.8657219973009447,
+      "recall": 0.8105263157894737,
+      "f1-score": 0.8207236842105263,
+      "support": 285.0
+    }
+  },
+  "model_coefficients": {
+    "hgg_prob_resnet": 0.5369824605736153,
+    "hgg_prob_swin": 4.063425042195521,
+    "hgg_prob_mil": 0.8900130196449593
+  },
+  "model_intercept": -2.404859450627464,
+  "feature_importance": {
+    "hgg_prob_resnet": 0.5369824605736153,
+    "hgg_prob_swin": 4.063425042195521,
+    "hgg_prob_mil": 0.8900130196449593
+  },
+  "metadata": {
+    "model_type": "LogisticRegression",
+    "training_date": "2026-01-09T22:28:55.524302",
+    "features": [
+      "hgg_prob_resnet",
+      "hgg_prob_swin",
+      "hgg_prob_mil"
+    ],
+    "target": "label",
+    "n_samples": 285,
+    "class_distribution": {
+      "LGG": 75,
+      "HGG": 210
+    }
+  }
+}
