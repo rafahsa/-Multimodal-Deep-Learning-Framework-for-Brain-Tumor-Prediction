@@ -1,0 +1,176 @@
+================================================================================
+OOF Predictions Verification Report
+================================================================================
+
+Generated: 2026-01-09 21:59:29.453107
+
+VERIFICATION CHECKS:
+--------------------------------------------------------------------------------
+✓ PASS - ResNet50-3D - CSV readable
+  Loaded 285 rows, 4 columns
+
+✓ PASS - ResNet50-3D - Required columns
+  All required columns present: ['patient_id', 'fold', 'hgg_prob', 'label']
+
+✓ PASS - ResNet50-3D - Patient ID uniqueness
+  All 285 patient IDs are unique
+
+✓ PASS - ResNet50-3D - Fold values
+  All folds present: [np.int64(0), np.int64(1), np.int64(2), np.int64(3), np.int64(4)]
+
+✓ PASS - ResNet50-3D - Fold distribution
+  Fold counts: {0: 57, 1: 57, 2: 57, 3: 57, 4: 57}
+
+✓ PASS - ResNet50-3D - Probability range
+  All probabilities in [0, 1]. Range: [0.1652, 0.9999]
+
+✓ PASS - ResNet50-3D - Label values
+  Label distribution: {0: 75, 1: 210} (0=LGG, 1=HGG)
+
+✓ PASS - ResNet50-3D - Missing values
+  No missing values found
+
+✓ PASS - ResNet50-3D - Fold 0 patient match
+  All 57 patients from validation split present
+
+✓ PASS - ResNet50-3D - Fold 1 patient match
+  All 57 patients from validation split present
+
+✓ PASS - ResNet50-3D - Fold 2 patient match
+  All 57 patients from validation split present
+
+✓ PASS - ResNet50-3D - Fold 3 patient match
+  All 57 patients from validation split present
+
+✓ PASS - ResNet50-3D - Fold 4 patient match
+  All 57 patients from validation split present
+
+✓ PASS - ResNet50-3D - Total patient match
+  All 285 patients from validation splits present
+
+✓ PASS - SwinUNETR-3D - CSV readable
+  Loaded 285 rows, 4 columns
+
+✓ PASS - SwinUNETR-3D - Required columns
+  All required columns present: ['patient_id', 'fold', 'hgg_prob', 'label']
+
+✓ PASS - SwinUNETR-3D - Patient ID uniqueness
+  All 285 patient IDs are unique
+
+✓ PASS - SwinUNETR-3D - Fold values
+  All folds present: [np.int64(0), np.int64(1), np.int64(2), np.int64(3), np.int64(4)]
+
+✓ PASS - SwinUNETR-3D - Fold distribution
+  Fold counts: {0: 57, 1: 57, 2: 57, 3: 57, 4: 57}
+
+✓ PASS - SwinUNETR-3D - Probability range
+  All probabilities in [0, 1]. Range: [0.0023, 1.0000]
+
+✓ PASS - SwinUNETR-3D - Label values
+  Label distribution: {0: 75, 1: 210} (0=LGG, 1=HGG)
+
+✓ PASS - SwinUNETR-3D - Missing values
+  No missing values found
+
+✓ PASS - SwinUNETR-3D - Fold 0 patient match
+  All 57 patients from validation split present
+
+✓ PASS - SwinUNETR-3D - Fold 1 patient match
+  All 57 patients from validation split present
+
+✓ PASS - SwinUNETR-3D - Fold 2 patient match
+  All 57 patients from validation split present
+
+✓ PASS - SwinUNETR-3D - Fold 3 patient match
+  All 57 patients from validation split present
+
+✓ PASS - SwinUNETR-3D - Fold 4 patient match
+  All 57 patients from validation split present
+
+✓ PASS - SwinUNETR-3D - Total patient match
+  All 285 patients from validation splits present
+
+✓ PASS - DualStreamMIL-3D - CSV readable
+  Loaded 285 rows, 4 columns
+
+✓ PASS - DualStreamMIL-3D - Required columns
+  All required columns present: ['patient_id', 'fold', 'hgg_prob', 'label']
+
+✓ PASS - DualStreamMIL-3D - Patient ID uniqueness
+  All 285 patient IDs are unique
+
+✓ PASS - DualStreamMIL-3D - Fold values
+  All folds present: [np.int64(0), np.int64(1), np.int64(2), np.int64(3), np.int64(4)]
+
+✓ PASS - DualStreamMIL-3D - Fold distribution
+  Fold counts: {0: 57, 1: 57, 2: 57, 3: 57, 4: 57}
+
+✓ PASS - DualStreamMIL-3D - Probability range
+  All probabilities in [0, 1]. Range: [0.1113, 0.9497]
+
+✓ PASS - DualStreamMIL-3D - Label values
+  Label distribution: {0: 75, 1: 210} (0=LGG, 1=HGG)
+
+✓ PASS - DualStreamMIL-3D - Missing values
+  No missing values found
+
+✓ PASS - DualStreamMIL-3D - Fold 0 patient match
+  All 57 patients from validation split present
+
+✓ PASS - DualStreamMIL-3D - Fold 1 patient match
+  All 57 patients from validation split present
+
+✓ PASS - DualStreamMIL-3D - Fold 2 patient match
+  All 57 patients from validation split present
+
+✓ PASS - DualStreamMIL-3D - Fold 3 patient match
+  All 57 patients from validation split present
+
+✓ PASS - DualStreamMIL-3D - Fold 4 patient match
+  All 57 patients from validation split present
+
+✓ PASS - DualStreamMIL-3D - Total patient match
+  All 285 patients from validation splits present
+
+✓ PASS - ResNet50-3D - No duplicate patients
+  Each patient appears exactly once
+
+✓ PASS - SwinUNETR-3D - No duplicate patients
+  Each patient appears exactly once
+
+✓ PASS - DualStreamMIL-3D - No duplicate patients
+  Each patient appears exactly once
+
+✓ PASS - Folds mutually exclusive
+  All folds are mutually exclusive (no patient overlap)
+
+✓ PASS - Label consistency
+  Labels are consistent across all models
+
+--------------------------------------------------------------------------------
+Summary: 47/47 checks passed
+
+MERGED DATASET STATISTICS:
+--------------------------------------------------------------------------------
+Total patients: 285
+Columns: patient_id, fold, hgg_prob_resnet, hgg_prob_swin, hgg_prob_mil, label
+
+Fold distribution:
+  Fold 0: 57 patients
+  Fold 1: 57 patients
+  Fold 2: 57 patients
+  Fold 3: 57 patients
+  Fold 4: 57 patients
+
+Label distribution:
+  LGG (label=0): 75 patients
+  HGG (label=1): 210 patients
+
+Probability statistics:
+  ResNet50-3D: mean=0.8884, std=0.1195, min=0.1652, max=0.9999
+  SwinUNETR-3D: mean=0.5799, std=0.4406, min=0.0023, max=1.0000
+  DualStreamMIL-3D: mean=0.4847, std=0.1530, min=0.1113, max=0.9497
+
+================================================================================
+END OF REPORT
+================================================================================

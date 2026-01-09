@@ -1,0 +1,127 @@
+================================================================================
+MERGED OOF PREDICTIONS VERIFICATION REPORT
+Meta-Learner Training Readiness Check
+================================================================================
+
+Generated: 2026-01-09 22:17:52.567582
+File: ensemble/oof_predictions/merged_oof_predictions.csv
+
+SUMMARY:
+--------------------------------------------------------------------------------
+Total checks: 30
+Passed: 30
+Failed: 0
+Success rate: 100.0%
+
+VERIFICATION RESULTS:
+--------------------------------------------------------------------------------
+✓ PASS - File exists and readable
+  Successfully loaded 285 rows, 6 columns
+
+✓ PASS - Required columns
+  All required columns present: ['patient_id', 'fold', 'hgg_prob_resnet', 'hgg_prob_swin', 'hgg_prob_mil', 'label']
+
+✓ PASS - Patient ID - No missing values
+  No missing patient IDs
+
+✓ PASS - Patient ID - Uniqueness
+  All 285 patient IDs are unique
+
+✓ PASS - Patient ID - Format
+  All patient IDs are non-empty strings
+
+✓ PASS - Fold - No missing values
+  No missing fold values
+
+✓ PASS - Fold - Valid range
+  All fold values in valid range [0, 4]. Folds present: [np.int64(0), np.int64(1), np.int64(2), np.int64(3), np.int64(4)]
+
+✓ PASS - Fold - Completeness
+  All 5 folds have exactly 57 patients each
+    fold_distribution: {0: 57, 1: 57, 2: 57, 3: 57, 4: 57}
+
+✓ PASS - Fold - Patient exclusivity
+  Each patient appears in exactly one fold
+
+✓ PASS - hgg_prob_resnet - No missing values
+  No missing values
+
+✓ PASS - hgg_prob_resnet - Valid range and type
+  All values in [0, 1]. Range: [0.165214, 0.999893], Mean: 0.888379, Std: 0.119482
+
+✓ PASS - hgg_prob_swin - No missing values
+  No missing values
+
+✓ PASS - hgg_prob_swin - Valid range and type
+  All values in [0, 1]. Range: [0.002333, 0.999992], Mean: 0.579864, Std: 0.440563
+
+✓ PASS - hgg_prob_mil - No missing values
+  No missing values
+
+✓ PASS - hgg_prob_mil - Valid range and type
+  All values in [0, 1]. Range: [0.111300, 0.949700], Mean: 0.484701, Std: 0.153005
+
+✓ PASS - Label - No missing values
+  No missing labels
+
+✓ PASS - Label - Valid values
+  All labels are valid (0=LGG, 1=HGG). Values present: [np.int64(0), np.int64(1)]
+
+✓ PASS - Label - Integer type
+  Label column is integer type
+
+✓ PASS - Label - Distribution
+  Label distribution: {0: 75, 1: 210}
+    LGG (0): 75
+    HGG (1): 210
+    Total: 285
+
+✓ PASS - Patient-fold matching - Fold 0
+  All 57 patients from validation split match
+
+✓ PASS - Patient-fold matching - Fold 1
+  All 57 patients from validation split match
+
+✓ PASS - Patient-fold matching - Fold 2
+  All 57 patients from validation split match
+
+✓ PASS - Patient-fold matching - Fold 3
+  All 57 patients from validation split match
+
+✓ PASS - Patient-fold matching - Fold 4
+  All 57 patients from validation split match
+
+✓ PASS - Total patient matching
+  All 285 patients from validation splits are present
+
+✓ PASS - Training readiness - Feature columns
+  All feature columns present: ['hgg_prob_resnet', 'hgg_prob_swin', 'hgg_prob_mil']
+
+✓ PASS - Training readiness - Target variable
+  Target variable 'label' present
+
+✓ PASS - Training readiness - Class balance
+  Both classes present. Min class size: 75
+    class_distribution: {1: 210, 0: 75}
+
+✓ PASS - Training readiness - Feature types
+  All features are numeric
+
+✓ PASS - Training readiness - Sample size
+  Sufficient samples for training: 285
+
+--------------------------------------------------------------------------------
+
+CONCLUSION:
+--------------------------------------------------------------------------------
+✅ ALL VERIFICATION CHECKS PASSED
+
+The merged OOF predictions are:
+  - Properly formatted and structured
+  - Complete with no missing values
+  - Correctly matched to validation splits
+  - Ready for Logistic Regression meta-learner training
+
+================================================================================
+END OF REPORT
+================================================================================
