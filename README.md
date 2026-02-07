@@ -176,6 +176,37 @@ python scripts/analysis/run_entropy_analysis.py --modality flair --axis axial --
 
 See `docs/stage_entropy_mil.md` for detailed documentation.
 
+## Operating Threshold / Deployment Settings
+
+The ensemble meta-learner uses configurable decision thresholds for binary classification (LGG=0, HGG=1). We select **0.22 as the default operating threshold for the main system (best F1, balanced precision/recall)**. We provide **0.19 as a high-sensitivity operating point to reduce false negatives in HGG detection**.
+
+### Operating Points
+
+| Threshold | Precision | Recall | F1 | Accuracy | FN | FP | Use Case |
+|-----------|-----------|--------|----|----------|----|----|----------|
+| **0.22** | 0.9000 | 0.9000 | 0.9000 | 0.8526 | 21 | 21 | **Default (balanced)** |
+| **0.19** | 0.8319 | 0.9429 | 0.8839 | 0.8175 | 12 | 40 | **High-sensitivity (lower FN)** |
+| 0.50 | 0.9643 | 0.7714 | 0.8571 | 0.8105 | 48 | 6 | Baseline reference |
+
+### Inference Commands
+
+**Official default run (threshold 0.22):**
+```bash
+python scripts/ensemble/test_ensemble_on_new_patients.py
+```
+
+**High-sensitivity run (threshold 0.19):**
+```bash
+python scripts/ensemble/test_ensemble_on_new_patients.py --threshold 0.19
+```
+
+**Baseline reference (threshold 0.50):**
+```bash
+python scripts/ensemble/test_ensemble_on_new_patients.py --threshold 0.50
+```
+
+The inference script defaults to threshold 0.22 if no `--threshold` argument is provided.
+
 ## Usage
 
 See individual README files in subdirectories for specific usage instructions.

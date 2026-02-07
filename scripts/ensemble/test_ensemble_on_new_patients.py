@@ -21,8 +21,10 @@ Usage:
 import argparse
 import sys
 import logging
+import json
 from pathlib import Path
 from typing import List, Tuple, Dict, Optional
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -810,6 +812,12 @@ def main():
         default=32,
         help='Bag size for MIL model (default: 32)'
     )
+    parser.add_argument(
+        '--threshold',
+        type=float,
+        default=0.22,
+        help='Classification threshold for ensemble predictions (default: 0.22)'
+    )
     
     args = parser.parse_args()
     
@@ -823,6 +831,7 @@ def main():
     logger.info("Ensemble Meta-Learner Test on New Patients")
     logger.info("=" * 80)
     logger.info(f"Device: {device}")
+    logger.info(f"Classification Threshold: {args.threshold:.2f}")
     
     # Resolve paths
     test_dir = Path(args.test_dir)
@@ -1014,14 +1023,12 @@ def main():
             # Get ensemble prediction
             logger.info("Running ensemble meta-learner...")
             
-            # Get prediction
-            ensemble_prediction_array = meta_learner.predict(features)
-            if len(ensemble_prediction_array) != 1:
-                raise ValueError(f"Expected single prediction, got array of length {len(ensemble_prediction_array)}")
-            ensemble_prediction = int(ensemble_prediction_array[0])
-            
             # Get probabilities (shape: (n_samples, n_classes))
             ensemble_proba_array = meta_learner.predict_proba(features)
+            
+            # Apply threshold to get prediction (instead of using model.predict which uses default 0.5)
+            ensemble_probability = float(ensemble_proba_array[0, 1])  # HGG probability
+            ensemble_prediction = int(ensemble_probability >= args.threshold)
             if ensemble_proba_array.shape != (1, 2):
                 raise ValueError(f"Expected proba shape (1, 2), got {ensemble_proba_array.shape}")
             
@@ -1033,8 +1040,7 @@ def main():
             if not np.allclose(ensemble_proba_array.sum(axis=1), 1.0, atol=1e-5):
                 raise ValueError(f"Ensemble probabilities don't sum to 1: {ensemble_proba_array.sum(axis=1)}")
             
-            # Extract HGG probability (class 1) - index [0, 1] means first sample, second class
-            ensemble_probability = float(ensemble_proba_array[0, 1])
+            # Extract probabilities (already extracted above, but keep for clarity)
             lgg_probability = float(ensemble_proba_array[0, 0])
             
             logger.info(f"  Meta-learner output probabilities: LGG={lgg_probability:.6f}, HGG={ensemble_probability:.6f}")
@@ -1048,7 +1054,7 @@ def main():
                 raise ValueError(f"Invalid ensemble prediction: {ensemble_prediction} (expected 0 or 1, got {type(ensemble_prediction)})")
             
             logger.info(f"  ✓ Ensemble HGG probability: {ensemble_probability:.6f}")
-            logger.info(f"  ✓ Ensemble prediction: {'HGG' if ensemble_prediction == 1 else 'LGG'}")
+            logger.info(f"  ✓ Ensemble prediction (threshold={args.threshold:.2f}): {'HGG' if ensemble_prediction == 1 else 'LGG'}")
             
             # Store results
             results.append({
@@ -1105,7 +1111,28 @@ def main():
     
     print("\n" + "=" * 80)
     print(f"Processed {len(results)} patients successfully")
+    print(f"Classification threshold used: {args.threshold:.2f}")
     print("=" * 80)
+    
+    # Save results to JSON file with threshold in filename
+    results_dir = project_root / 'ensemble' / 'results'
+    results_dir.mkdir(parents=True, exist_ok=True)
+    
+    threshold_str = f"{args.threshold:.2f}".replace('.', '_')
+    output_file = results_dir / f'inference_threshold_{threshold_str}.json'
+    
+    output_data = {
+        'threshold': float(args.threshold),
+        'n_patients': len(results),
+        'timestamp': datetime.now().isoformat(),
+        'results': results
+    }
+    
+    with open(output_file, 'w') as f:
+        json.dump(output_data, f, indent=2)
+    
+    logger.info(f"\nResults saved to: {output_file}")
+    print(f"\nResults saved to: {output_file}")
     
     return results
 

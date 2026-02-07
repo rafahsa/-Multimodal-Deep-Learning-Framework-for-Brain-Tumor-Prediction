@@ -159,20 +159,28 @@ def train_meta_learner(X: np.ndarray, y: np.ndarray, use_class_weights: bool = T
     return model
 
 
-def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray) -> Dict:
+def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray, threshold: float = 0.5) -> Dict:
     """
-    Evaluate model performance.
+    Evaluate model performance at a given threshold.
+    
+    Args:
+        model: Trained LogisticRegression model
+        X: Feature matrix
+        y: True labels
+        threshold: Classification threshold (default: 0.5)
     
     Returns:
         Dictionary with evaluation metrics
     """
     logger.info("\n" + "="*80)
-    logger.info("Evaluating Meta-Learner")
+    logger.info(f"Evaluating Meta-Learner (Threshold = {threshold:.2f})")
     logger.info("="*80)
     
-    # Predictions
-    y_pred = model.predict(X)
+    # Get probabilities
     y_pred_proba = model.predict_proba(X)[:, 1]  # Probability of positive class (HGG)
+    
+    # Apply threshold to get predictions
+    y_pred = (y_pred_proba >= threshold).astype(int)
     
     # Compute metrics
     accuracy = accuracy_score(y, y_pred)
@@ -183,6 +191,9 @@ def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray) -> D
     
     # Confusion matrix
     cm = confusion_matrix(y, y_pred)
+    
+    # Extract confusion matrix components
+    tn, fp, fn, tp = cm.ravel()
     
     # Classification report
     class_report = classification_report(y, y_pred, output_dict=True, zero_division=0)
@@ -195,11 +206,12 @@ def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray) -> D
     logger.info(f"  F1-Score:  {f1:.6f}")
     logger.info(f"  AUC-ROC:   {auc:.6f}")
     
-    logger.info(f"\nConfusion Matrix:")
+    logger.info(f"\nConfusion Matrix (Threshold = {threshold:.2f}):")
     logger.info(f"                Predicted")
     logger.info(f"                LGG  HGG")
-    logger.info(f"  Actual LGG    {cm[0][0]:4d}  {cm[0][1]:4d}")
-    logger.info(f"        HGG     {cm[1][0]:4d}  {cm[1][1]:4d}")
+    logger.info(f"  Actual LGG    {tn:4d}  {fp:4d}")
+    logger.info(f"        HGG     {fn:4d}  {tp:4d}")
+    logger.info(f"\n  TN: {tn}, FP: {fp}, FN: {fn}, TP: {tp}")
     
     logger.info(f"\nPer-Class Metrics:")
     logger.info(f"  LGG (class 0):")
@@ -213,14 +225,22 @@ def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray) -> D
     logger.info(f"    F1-Score:  {class_report['1']['f1-score']:.6f}")
     logger.info(f"    Support:   {class_report['1']['support']:.0f}")
     
+    # Extract confusion matrix components
+    tn, fp, fn, tp = cm.ravel()
+    
     # Compile metrics dictionary
     metrics = {
+        'threshold': float(threshold),
         'accuracy': float(accuracy),
         'precision': float(precision),
         'recall': float(recall),
         'f1_score': float(f1),
         'auc_roc': float(auc),
         'confusion_matrix': cm.tolist(),
+        'tn': int(tn),
+        'fp': int(fp),
+        'fn': int(fn),
+        'tp': int(tp),
         'classification_report': class_report,
         'model_coefficients': {
             FEATURE_COLUMNS[i]: float(model.coef_[0][i]) for i in range(len(FEATURE_COLUMNS))
@@ -234,7 +254,7 @@ def evaluate_model(model: LogisticRegression, X: np.ndarray, y: np.ndarray) -> D
     return metrics
 
 
-def save_model(model: LogisticRegression, metrics: Dict):
+def save_model(model: LogisticRegression, metrics: Dict, save_model_file: bool = True):
     """Save trained model and metrics."""
     logger.info("\n" + "="*80)
     logger.info("Saving Model and Metrics")
@@ -244,10 +264,11 @@ def save_model(model: LogisticRegression, metrics: Dict):
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     
-    # Save model
-    logger.info(f"Saving model to: {MODEL_FILE}")
-    joblib.dump(model, MODEL_FILE)
-    logger.info("✓ Model saved")
+    # Save model (only if requested, e.g., during training)
+    if save_model_file:
+        logger.info(f"Saving model to: {MODEL_FILE}")
+        joblib.dump(model, MODEL_FILE)
+        logger.info("✓ Model saved")
     
     # Prepare metrics for JSON serialization
     metrics_serializable = metrics.copy()
@@ -257,9 +278,12 @@ def save_model(model: LogisticRegression, metrics: Dict):
             metrics_serializable[key] = float(value) if isinstance(value, np.floating) else int(value)
     
     # Add metadata
+    threshold = metrics.get('threshold', 0.5)
     metrics_serializable['metadata'] = {
         'model_type': 'LogisticRegression',
-        'training_date': datetime.now().isoformat(),
+        'evaluation_date': datetime.now().isoformat(),
+        'threshold': float(threshold),
+        'dataset': 'OOF predictions (validation data from cross-validation)',
         'features': FEATURE_COLUMNS,
         'target': TARGET_COLUMN,
         'n_samples': int(len(pd.read_csv(MERGED_OOF_FILE))),
@@ -269,18 +293,43 @@ def save_model(model: LogisticRegression, metrics: Dict):
         }
     }
     
-    # Save metrics
-    logger.info(f"Saving metrics to: {METRICS_FILE}")
-    with open(METRICS_FILE, 'w') as f:
+    # Save metrics with threshold in filename
+    threshold_str = f"{threshold:.2f}".replace('.', '_')
+    metrics_file = RESULTS_DIR / f'eval_threshold_{threshold_str}.json'
+    logger.info(f"Saving metrics to: {metrics_file}")
+    with open(metrics_file, 'w') as f:
         json.dump(metrics_serializable, f, indent=2)
     logger.info("✓ Metrics saved")
+    
+    return metrics_file
 
 
 def main():
-    """Main training function."""
+    """Main training/evaluation function."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description='Train or evaluate Logistic Regression Meta-Learner',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        '--threshold',
+        type=float,
+        default=0.22,
+        help='Classification threshold for evaluation (default: 0.22)'
+    )
+    parser.add_argument(
+        '--skip-training',
+        action='store_true',
+        help='Skip training and only evaluate with existing model (if available)'
+    )
+    
+    args = parser.parse_args()
+    
     logger.info("=" * 80)
-    logger.info("Logistic Regression Meta-Learner Training")
+    logger.info("Logistic Regression Meta-Learner Training/Evaluation")
     logger.info("=" * 80)
+    logger.info(f"Threshold: {args.threshold:.2f}")
     
     try:
         # Step 1: Load data
@@ -289,28 +338,39 @@ def main():
         # Step 2: Prepare data
         X, y = prepare_data(df)
         
-        # Step 3: Train model
-        # Using class weights to handle class imbalance (75 LGG vs 210 HGG)
-        model = train_meta_learner(X, y, use_class_weights=True)
+        # Step 3: Train or load model
+        if args.skip_training and MODEL_FILE.exists():
+            logger.info(f"\nLoading existing model from: {MODEL_FILE}")
+            model = joblib.load(MODEL_FILE)
+            logger.info("✓ Model loaded")
+        else:
+            # Step 3: Train model
+            # Using class weights to handle class imbalance (75 LGG vs 210 HGG)
+            model = train_meta_learner(X, y, use_class_weights=True)
         
-        # Step 4: Evaluate model
-        metrics = evaluate_model(model, X, y)
+        # Step 4: Evaluate model at specified threshold
+        metrics = evaluate_model(model, X, y, threshold=args.threshold)
         
         # Step 5: Save model and metrics
-        save_model(model, metrics)
+        save_model_file = not args.skip_training
+        metrics_file = save_model(model, metrics, save_model_file=save_model_file)
         
         logger.info("\n" + "=" * 80)
-        logger.info("Training Complete")
+        logger.info("Evaluation Complete")
         logger.info("=" * 80)
-        logger.info(f"Model saved to: {MODEL_FILE}")
-        logger.info(f"Metrics saved to: {METRICS_FILE}")
-        logger.info(f"\nFinal Performance:")
+        if save_model_file:
+            logger.info(f"Model saved to: {MODEL_FILE}")
+        logger.info(f"Metrics saved to: {metrics_file}")
+        logger.info(f"\nPerformance at Threshold {args.threshold:.2f}:")
+        logger.info(f"  TN: {metrics['tn']}, FP: {metrics['fp']}, FN: {metrics['fn']}, TP: {metrics['tp']}")
         logger.info(f"  Accuracy: {metrics['accuracy']:.4f}")
+        logger.info(f"  Precision: {metrics['precision']:.4f}")
+        logger.info(f"  Recall: {metrics['recall']:.4f}")
         logger.info(f"  F1-Score: {metrics['f1_score']:.4f}")
         logger.info(f"  AUC-ROC:  {metrics['auc_roc']:.4f}")
         
     except Exception as e:
-        logger.error(f"Training failed with error: {e}", exc_info=True)
+        logger.error(f"Processing failed with error: {e}", exc_info=True)
         raise
 
 
