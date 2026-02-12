@@ -1,0 +1,22 @@
+{
+  "unique_labels": [
+    0,
+    1
+  ],
+  "label_valid": 1,
+  "n_samples": 285,
+  "class_counts": {
+    "0": 75,
+    "1": 210
+  },
+  "threshold": 0.35,
+  "tn": 34,
+  "fp": 41,
+  "fn": 11,
+  "tp": 199,
+  "expected_tn": 34,
+  "expected_fp": 41,
+  "expected_fn": 11,
+  "expected_tp": 199,
+  "matches_expected": 1
+}

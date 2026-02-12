@@ -1,0 +1,38 @@
+{
+  "calibration_mode": "isotonic",
+  "timestamp": "2026-02-07T22:31:27.177932",
+  "args": {
+    "calibration": "isotonic",
+    "split_seed": 42,
+    "calibration_fraction": 0.7,
+    "recall_target": 0.94,
+    "sweep_start": 0.05,
+    "sweep_end": 0.95,
+    "sweep_step": 0.01,
+    "n_bins": 10
+  },
+  "thresholds": {
+    "balanced": {
+      "threshold": 0.4000000000000001,
+      "tn": 17,
+      "fp": 6,
+      "fn": 3,
+      "tp": 60,
+      "precision": 0.9090909090909091,
+      "recall": 0.9523809523809523,
+      "f1_score": 0.9302325581395349,
+      "accuracy": 0.8953488372093024
+    },
+    "high_sensitivity": {
+      "threshold": 0.4000000000000001,
+      "tn": 17,
+      "fp": 6,
+      "fn": 3,
+      "tp": 60,
+      "precision": 0.9090909090909091,
+      "recall": 0.9523809523809523,
+      "f1_score": 0.9302325581395349,
+      "accuracy": 0.8953488372093024
+    }
+  }
+}

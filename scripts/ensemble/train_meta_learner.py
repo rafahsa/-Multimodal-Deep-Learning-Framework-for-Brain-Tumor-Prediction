@@ -2,8 +2,10 @@
 Train Logistic Regression Meta-Learner on Merged OOF Predictions
 
 This script trains a Logistic Regression meta-learner to combine predictions
-from three base models (ResNet50-3D, SwinUNETR-3D, DualStreamMIL-3D) using
+from three base models (ResNet50-3D, SwinUNETR-3D, NEW DualStreamMIL-3D) using
 their out-of-fold (OOF) predictions.
+
+NOTE: Uses NEW MIL with calibrated probabilities (mil_prob) instead of old MIL (hgg_prob_mil).
 
 Usage:
     python scripts/ensemble/train_meta_learner.py
@@ -40,14 +42,15 @@ METRICS_FILE = RESULTS_DIR / 'meta_learner_metrics.json'
 MODEL_FILE = MODELS_DIR / 'meta_learner_logistic_regression.joblib'
 
 # Feature columns (base model predictions)
-FEATURE_COLUMNS = ['hgg_prob_resnet', 'hgg_prob_swin', 'hgg_prob_mil']
+# NOTE: mil_prob is the NEW calibrated MIL feature (replaces old hgg_prob_mil)
+FEATURE_COLUMNS = ['hgg_prob_resnet', 'hgg_prob_swin', 'mil_prob']
 TARGET_COLUMN = 'label'
 
 
 def load_data() -> pd.DataFrame:
     """Load merged OOF predictions."""
     if not MERGED_OOF_FILE.exists():
-        raise FileNotFoundError(f"Merged OOF file not found: {MERGEOOF_FILE}")
+        raise FileNotFoundError(f"Merged OOF file not found: {MERGED_OOF_FILE}")
     
     logger.info(f"Loading merged OOF predictions from: {MERGED_OOF_FILE}")
     df = pd.read_csv(MERGED_OOF_FILE)
@@ -266,9 +269,9 @@ def save_model(model: LogisticRegression, metrics: Dict, save_model_file: bool =
     
     # Save model (only if requested, e.g., during training)
     if save_model_file:
-        logger.info(f"Saving model to: {MODEL_FILE}")
-        joblib.dump(model, MODEL_FILE)
-        logger.info("✓ Model saved")
+    logger.info(f"Saving model to: {MODEL_FILE}")
+    joblib.dump(model, MODEL_FILE)
+    logger.info("✓ Model saved")
     
     # Prepare metrics for JSON serialization
     metrics_serializable = metrics.copy()
@@ -344,9 +347,9 @@ def main():
             model = joblib.load(MODEL_FILE)
             logger.info("✓ Model loaded")
         else:
-            # Step 3: Train model
-            # Using class weights to handle class imbalance (75 LGG vs 210 HGG)
-            model = train_meta_learner(X, y, use_class_weights=True)
+        # Step 3: Train model
+        # Using class weights to handle class imbalance (75 LGG vs 210 HGG)
+        model = train_meta_learner(X, y, use_class_weights=True)
         
         # Step 4: Evaluate model at specified threshold
         metrics = evaluate_model(model, X, y, threshold=args.threshold)
@@ -359,7 +362,7 @@ def main():
         logger.info("Evaluation Complete")
         logger.info("=" * 80)
         if save_model_file:
-            logger.info(f"Model saved to: {MODEL_FILE}")
+        logger.info(f"Model saved to: {MODEL_FILE}")
         logger.info(f"Metrics saved to: {metrics_file}")
         logger.info(f"\nPerformance at Threshold {args.threshold:.2f}:")
         logger.info(f"  TN: {metrics['tn']}, FP: {metrics['fp']}, FN: {metrics['fn']}, TP: {metrics['tp']}")

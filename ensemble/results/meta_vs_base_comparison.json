@@ -1,0 +1,106 @@
+{
+  "evaluation_set": "held-out threshold selection set (30% of OOF, seed=42)",
+  "n_samples": 86,
+  "class_distribution": {
+    "0": 23,
+    "1": 63
+  },
+  "results": [
+    {
+      "model": "ResNet50-3D",
+      "threshold": 0.41,
+      "tn": 2,
+      "fp": 21,
+      "fn": 0,
+      "tp": 63,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8571428571428571,
+      "accuracy": 0.7558139534883721
+    },
+    {
+      "model": "SwinUNETR-3D",
+      "threshold": 0.41,
+      "tn": 21,
+      "fp": 2,
+      "fn": 14,
+      "tp": 49,
+      "precision": 0.9607843137254902,
+      "recall": 0.7777777777777778,
+      "f1": 0.8596491228070176,
+      "accuracy": 0.813953488372093
+    },
+    {
+      "model": "DualStreamMIL-3D",
+      "threshold": 0.41,
+      "tn": 6,
+      "fp": 17,
+      "fn": 3,
+      "tp": 60,
+      "precision": 0.7792207792207793,
+      "recall": 0.9523809523809523,
+      "f1": 0.8571428571428571,
+      "accuracy": 0.7674418604651163
+    },
+    {
+      "model": "Ensemble (LR + Platt)",
+      "threshold": 0.41,
+      "tn": 19,
+      "fp": 4,
+      "fn": 4,
+      "tp": 59,
+      "precision": 0.9365079365079365,
+      "recall": 0.9365079365079365,
+      "f1": 0.9365079365079365,
+      "accuracy": 0.9069767441860465
+    },
+    {
+      "model": "ResNet50-3D",
+      "threshold": 0.38,
+      "tn": 2,
+      "fp": 21,
+      "fn": 0,
+      "tp": 63,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8571428571428571,
+      "accuracy": 0.7558139534883721
+    },
+    {
+      "model": "SwinUNETR-3D",
+      "threshold": 0.38,
+      "tn": 21,
+      "fp": 2,
+      "fn": 13,
+      "tp": 50,
+      "precision": 0.9615384615384616,
+      "recall": 0.7936507936507936,
+      "f1": 0.8695652173913043,
+      "accuracy": 0.8255813953488372
+    },
+    {
+      "model": "DualStreamMIL-3D",
+      "threshold": 0.38,
+      "tn": 4,
+      "fp": 19,
+      "fn": 1,
+      "tp": 62,
+      "precision": 0.7654320987654321,
+      "recall": 0.9841269841269841,
+      "f1": 0.8611111111111112,
+      "accuracy": 0.7674418604651163
+    },
+    {
+      "model": "Ensemble (LR + Platt)",
+      "threshold": 0.38,
+      "tn": 17,
+      "fp": 6,
+      "fn": 3,
+      "tp": 60,
+      "precision": 0.9090909090909091,
+      "recall": 0.9523809523809523,
+      "f1": 0.9302325581395349,
+      "accuracy": 0.8953488372093024
+    }
+  ]
+}

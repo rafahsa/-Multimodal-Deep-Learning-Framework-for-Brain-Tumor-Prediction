@@ -1,0 +1,9 @@
+Check,Status,Details
+A1_data_integrity,PASSED,"{'n_rows': 285, 'n_features': 3, 'class_distribution': {1: 210, 0: 75}, 'feature_stats': {'hgg_prob_"
+A2_label_sanity,PASSED,"{'threshold': 0.35, 'tn': 34, 'fp': 41, 'fn': 11, 'tp': 199, 'expected_tn': 34, 'expected_fp': 41, '"
+B3_oof_provenance,PASSED,"{'merged_file': 'ensemble/oof_predictions/merged_oof_predictions.csv', 'file_exists': 1, 'scripts_fo"
+B4_leakage_tests,FAILED,"{'trivial_index_classifier': {'mean_accuracy': 0.8421052631578947, 'std_accuracy': 0.178568570526308"
+C5_calibration_equivalence,INCONCLUSIVE,"{'sklearn_method_failed': ""The 'cv' parameter of CalibratedClassifierCV must be an int in the range "
+C6_nested_evaluation,FAILED,"{'n_seeds': 5, 'fn_mean': 9.0, 'fn_std': 1.6733200530681511, 'fn_min': 7, 'fn_max': 12, 'fp_mean': 1"
+D7_margin_analysis,PASSED,"{'n_fp_cases': 1, 'n_borderline_hgg': 5}"
+D8_overfitting_sensitivity,PASSED,"{'n_combinations': 5, 'results': [{'max_depth': 2, 'n_estimators': 50, 'min_child_weight': 1, 'subsa"

@@ -41,7 +41,7 @@ class MILSliceDataset(Dataset):
         split_file: Path to CSV file with patient IDs and labels
         modalities: List of modalities to load (default: ['t1', 't1ce', 't2', 'flair'])
         bag_size: Fixed number of slices per bag (default: 64)
-        sampling_strategy: 'random', 'sequential', or 'entropy' (default: 'random')
+        sampling_strategy: 'random', 'sequential', 'entropy', or 'hybrid' (default: 'random')
         transform: Optional transform pipeline (applied per slice)
         class_to_idx: Dictionary mapping class names to indices
         seed: Random seed for reproducibility
@@ -221,18 +221,145 @@ class MILSliceDataset(Dataset):
                 bag = slices[indices]
             elif self.sampling_strategy == 'entropy':
                 # Entropy-based sampling (select most informative slices)
-                # Compute entropy for each slice
+                # Compute entropy for each slice using numerically stable method
                 entropies = []
                 for i in range(N):
                     slice_2d = slices[i]  # (4, H, W)
-                    # Compute entropy across all modalities
-                    entropy = -np.sum(slice_2d * np.log(slice_2d + 1e-10))
-                    entropies.append(entropy)
+                    # Normalize slice intensities to [0, 1] range for stability
+                    slice_flat = slice_2d.flatten()
+                    
+                    # Remove any NaN or inf values
+                    slice_flat = slice_flat[np.isfinite(slice_flat)]
+                    
+                    if len(slice_flat) == 0:
+                        # Empty or all invalid slice, assign zero entropy
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Normalize to [0, 1] range
+                    slice_min = slice_flat.min()
+                    slice_max = slice_flat.max()
+                    if slice_max - slice_min < 1e-10:
+                        # Constant slice, zero entropy
+                        entropies.append(0.0)
+                        continue
+                    
+                    slice_normalized = (slice_flat - slice_min) / (slice_max - slice_min)
+                    
+                    # Compute histogram-based entropy (more stable than direct formula)
+                    # Use 256 bins for reasonable granularity
+                    hist, _ = np.histogram(slice_normalized, bins=256, range=(0.0, 1.0))
+                    hist_sum = hist.sum()
+                    
+                    if hist_sum == 0:
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Normalize histogram to probabilities
+                    probs = hist / hist_sum
+                    # Remove zeros to avoid log(0)
+                    probs = probs[probs > 0]
+                    
+                    if len(probs) == 0:
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Compute Shannon entropy: H = -Σ p * log2(p)
+                    # Use log2 for standard entropy, but log is fine too
+                    entropy = -np.sum(probs * np.log2(probs + 1e-12))
+                    
+                    # Ensure entropy is finite and non-negative
+                    if not np.isfinite(entropy) or entropy < 0:
+                        entropy = 0.0
+                    
+                    entropies.append(float(entropy))
+                
                 entropies = np.array(entropies)
+                # Replace any remaining NaN or inf with 0
+                entropies = np.nan_to_num(entropies, nan=0.0, posinf=0.0, neginf=0.0)
+                
                 # Select top bag_size slices by entropy
                 top_indices = np.argsort(entropies)[-self.bag_size:]
                 top_indices = sorted(top_indices)
                 bag = slices[top_indices]
+            elif self.sampling_strategy == 'hybrid':
+                # Hybrid sampling: 50% from top-K entropy, 50% random from remaining
+                # Compute entropy for each slice using numerically stable method
+                entropies = []
+                for i in range(N):
+                    slice_2d = slices[i]  # (4, H, W)
+                    # Normalize slice intensities to [0, 1] range for stability
+                    slice_flat = slice_2d.flatten()
+                    
+                    # Remove any NaN or inf values
+                    slice_flat = slice_flat[np.isfinite(slice_flat)]
+                    
+                    if len(slice_flat) == 0:
+                        # Empty or all invalid slice, assign zero entropy
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Normalize to [0, 1] range
+                    slice_min = slice_flat.min()
+                    slice_max = slice_flat.max()
+                    if slice_max - slice_min < 1e-10:
+                        # Constant slice, zero entropy
+                        entropies.append(0.0)
+                        continue
+                    
+                    slice_normalized = (slice_flat - slice_min) / (slice_max - slice_min)
+                    
+                    # Compute histogram-based entropy (more stable than direct formula)
+                    # Use 256 bins for reasonable granularity
+                    hist, _ = np.histogram(slice_normalized, bins=256, range=(0.0, 1.0))
+                    hist_sum = hist.sum()
+                    
+                    if hist_sum == 0:
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Normalize histogram to probabilities
+                    probs = hist / hist_sum
+                    # Remove zeros to avoid log(0)
+                    probs = probs[probs > 0]
+                    
+                    if len(probs) == 0:
+                        entropies.append(0.0)
+                        continue
+                    
+                    # Compute Shannon entropy: H = -Σ p * log2(p)
+                    # Use log2 for standard entropy, but log is fine too
+                    entropy = -np.sum(probs * np.log2(probs + 1e-12))
+                    
+                    # Ensure entropy is finite and non-negative
+                    if not np.isfinite(entropy) or entropy < 0:
+                        entropy = 0.0
+                    
+                    entropies.append(float(entropy))
+                
+                entropies = np.array(entropies)
+                # Replace any remaining NaN or inf with 0
+                entropies = np.nan_to_num(entropies, nan=0.0, posinf=0.0, neginf=0.0)
+                
+                # Select top-K by entropy (50% of bag_size)
+                k_entropy = self.bag_size // 2
+                top_entropy_indices = np.argsort(entropies)[-k_entropy:]
+                top_entropy_indices = sorted(top_entropy_indices)
+                
+                # Select random from remaining (50% of bag_size)
+                remaining_indices = np.setdiff1d(np.arange(N), top_entropy_indices)
+                k_random = self.bag_size - k_entropy
+                if len(remaining_indices) >= k_random:
+                    np.random.seed(self.seed)
+                    random_indices = np.random.choice(remaining_indices, size=k_random, replace=False)
+                    random_indices = sorted(random_indices)
+                else:
+                    # If not enough remaining, use all remaining
+                    random_indices = sorted(remaining_indices)
+                
+                # Combine and sort
+                combined_indices = sorted(np.concatenate([top_entropy_indices, random_indices]))
+                bag = slices[combined_indices]
             else:
                 raise ValueError(f"Unsupported sampling_strategy: {self.sampling_strategy}")
         else:

@@ -1,7 +1,8 @@
 {
   "threshold": 0.22,
+  "calibration_mode": "none",
   "n_patients": 2,
-  "timestamp": "2026-02-07T18:56:25.622054",
+  "timestamp": "2026-02-08T00:56:41.819539",
   "results": [
     {
       "patient_id": "UCSF-PDGM-0004",
@@ -9,7 +10,9 @@
       "swin_prob": 0.9223775863647461,
       "mil_prob": 0.4891808032989502,
       "ensemble_prob": 0.9027339531026121,
-      "ensemble_pred": 1
+      "ensemble_prob_uncalibrated": null,
+      "ensemble_pred": 1,
+      "calibration_mode": "none"
     },
     {
       "patient_id": "UCSF-PDGM-0005",
@@ -17,7 +20,9 @@
       "swin_prob": 0.9749168753623962,
       "mil_prob": 0.4976997673511505,
       "ensemble_prob": 0.9205654968531004,
-      "ensemble_pred": 1
+      "ensemble_prob_uncalibrated": null,
+      "ensemble_pred": 1,
+      "calibration_mode": "none"
     }
   ]
 }

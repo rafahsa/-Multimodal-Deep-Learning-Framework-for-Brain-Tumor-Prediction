@@ -1,0 +1,14 @@
+{
+  "overall_auc_roc": 0.8843174603174604,
+  "mean_fold_auc_roc": 0.9,
+  "std_fold_auc_roc": 0.04769306416939957,
+  "per_fold_auc_roc": [
+    0.8746031746031746,
+    0.9682539682539683,
+    0.8682539682539684,
+    0.9444444444444444,
+    0.8444444444444443
+  ],
+  "n_folds": 5,
+  "note": "AUC computed from nested CV with meta-features and Platt calibration"
+}

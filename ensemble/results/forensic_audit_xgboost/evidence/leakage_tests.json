@@ -1,0 +1,14 @@
+{
+  "trivial_index_classifier": {
+    "mean_accuracy": 0.8421052631578947,
+    "std_accuracy": 0.1785685705263084,
+    "expected_chance": 0.5,
+    "suspicious": 1
+  },
+  "xgboost_shuffled_labels": {
+    "mean_accuracy": 0.6912280701754385,
+    "std_accuracy": 0.0377906302255053,
+    "expected_chance": 0.7368421052631579,
+    "suspicious": 0
+  }
+}

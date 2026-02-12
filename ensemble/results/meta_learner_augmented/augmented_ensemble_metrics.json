@@ -1,0 +1,37 @@
+{
+  "policy_a_fixed_threshold_0_22": {
+    "threshold": 0.22,
+    "auc": 0.9076190476190475,
+    "accuracy": 0.8421052631578947,
+    "precision": 0.8985507246376812,
+    "recall": 0.8857142857142857,
+    "f1": 0.8920863309352518,
+    "hgg_recall": 0.8857142857142857,
+    "fn_count": 24,
+    "fn_rate": 0.11428571428571428,
+    "tp": 186,
+    "tn": 54,
+    "fp": 21
+  },
+  "policy_b_optimized_threshold": {
+    "threshold": 0.16000000000000003,
+    "auc": 0.9076190476190475,
+    "accuracy": 0.7543859649122807,
+    "precision": 0.75,
+    "recall": 1.0,
+    "f1": 0.8571428571428571,
+    "hgg_recall": 1.0,
+    "fn_count": 0,
+    "fn_rate": 0.0,
+    "tp": 210,
+    "tn": 5,
+    "fp": 70
+  },
+  "model_coefficients": {
+    "hgg_prob_resnet": 0.5520260146919583,
+    "hgg_prob_swin": 4.141854012800347,
+    "mil_prob_baseline": 0.11343004039110464,
+    "mil_prob_roi": 0.007047205841613906
+  },
+  "model_intercept": -2.134271390939638
+}

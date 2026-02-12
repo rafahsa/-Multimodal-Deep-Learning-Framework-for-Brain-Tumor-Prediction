@@ -1,0 +1,156 @@
+{
+  "checkpoint_info": {
+    "checkpoint_path": "/workspace/brain_tumor_project/results/ResNet50-3D/runs/fold_0/run_20260107_060952/checkpoints/best_ema.pt",
+    "fold": 0,
+    "target_class": "pred",
+    "num_patients": 12,
+    "model_name": "ResNet50-3D",
+    "input_shape": "(1, 4, 128, 128, 128)"
+  },
+  "patients": [
+    {
+      "patient_id": "Brats18_TCIA02_168_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.35287007689476013,
+        "HGG": 0.6471298933029175
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA03_138_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.1692659556865692,
+        "HGG": 0.8307340741157532
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA01_335_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.0995083749294281,
+        "HGG": 0.9004915952682495
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA10_639_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.1481432169675827,
+        "HGG": 0.8518568277359009
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA10_130_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.3671078681945801,
+        "HGG": 0.6328921318054199
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA09_451_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.37532171607017517,
+        "HGG": 0.6246782541275024
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA13_621_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.10598485916852951,
+        "HGG": 0.8940151929855347
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA12_466_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.275780588388443,
+        "HGG": 0.7242193818092346
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA13_654_1",
+      "class": "LGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.22434696555137634,
+        "HGG": 0.7756530046463013
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA06_332_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.2875237762928009,
+        "HGG": 0.7124761939048767
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA01_186_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.27958089113235474,
+        "HGG": 0.7204190492630005
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    },
+    {
+      "patient_id": "Brats18_TCIA02_314_1",
+      "class": "HGG",
+      "predicted_class": 1,
+      "predicted_class_name": "HGG",
+      "probabilities": {
+        "LGG": 0.11937265843153,
+        "HGG": 0.8806273937225342
+      },
+      "target_class": 1,
+      "target_class_name": "HGG"
+    }
+  ]
+}

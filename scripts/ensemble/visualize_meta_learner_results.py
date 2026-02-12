@@ -93,8 +93,8 @@ def load_probabilities_if_available() -> Optional[Tuple[np.ndarray, np.ndarray]]
             return None
         
         df = pd.read_csv(MERGED_OOF_FILE)
-        y_true = df[TARGET_COLUMN].values
-        
+    y_true = df[TARGET_COLUMN].values
+    
         # Try to load model and compute probabilities
         model_file = ENSEMBLE_DIR / 'models' / 'meta_learner_logistic_regression.joblib'
         if model_file.exists():
@@ -625,7 +625,7 @@ def main():
     eval_data_list.sort(key=lambda x: x.get('threshold', 0))
     thresholds = [d.get('threshold', 0) for d in eval_data_list]
     logger.info(f"Loaded {len(eval_data_list)} eval JSON files with thresholds: {thresholds}")
-    
+        
     # Create output directory
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -643,10 +643,10 @@ def main():
         y_true, y_pred_proba = None, None
     
     # Generate visualizations
-    logger.info("\n" + "=" * 80)
-    logger.info("Generating Visualizations")
-    logger.info("=" * 80)
-    
+        logger.info("\n" + "=" * 80)
+        logger.info("Generating Visualizations")
+        logger.info("=" * 80)
+        
     generated_plots = []
     skipped_plots = []
     
@@ -731,7 +731,7 @@ def main():
             except Exception as e:
                 logger.warning(f"Could not generate legacy performance_metrics_summary.png: {e}")
                 skipped_plots.append('performance_metrics_summary.png (legacy, skipped)')
-    
+        
     # Create README
     command_used = ' '.join(['python', 'scripts/ensemble/visualize_meta_learner_results.py'] + 
                            (['--eval-jsons'] + [str(p) for p in eval_json_paths] if len(eval_json_paths) > 1 
@@ -740,9 +740,9 @@ def main():
     create_readme(eval_data_list, out_dir, command_used)
     
     # Summary
-    logger.info("\n" + "=" * 80)
-    logger.info("Visualization Generation Complete")
-    logger.info("=" * 80)
+        logger.info("\n" + "=" * 80)
+        logger.info("Visualization Generation Complete")
+        logger.info("=" * 80)
     logger.info(f"All figures saved to: {out_dir}")
     logger.info(f"\nGenerated plots ({len(generated_plots)}):")
     for plot in generated_plots:

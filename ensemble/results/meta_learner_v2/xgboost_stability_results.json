@@ -1,0 +1,102 @@
+{
+  "model_config": {
+    "max_depth": 4,
+    "learning_rate": 0.1,
+    "n_estimators": 100
+  },
+  "stability_seeds": [
+    21,
+    42,
+    77,
+    123,
+    202
+  ],
+  "stability_status": "PASSED",
+  "stability_reason": "FN \u2264 1 for all seeds (range: [0, 0]), no spikes",
+  "results": [
+    {
+      "seed": 21,
+      "selected_threshold": 0.35000000000000003,
+      "threshold": 0.35000000000000003,
+      "tn": 74,
+      "fp": 1,
+      "fn": 0,
+      "tp": 210,
+      "precision": 0.995260663507109,
+      "recall": 1.0,
+      "f1": 0.997624703087886,
+      "accuracy": 0.9964912280701754,
+      "specificity": 0.9866666666666667,
+      "cost": 1.0
+    },
+    {
+      "seed": 42,
+      "selected_threshold": 0.39000000000000007,
+      "threshold": 0.39000000000000007,
+      "tn": 74,
+      "fp": 1,
+      "fn": 0,
+      "tp": 210,
+      "precision": 0.995260663507109,
+      "recall": 1.0,
+      "f1": 0.997624703087886,
+      "accuracy": 0.9964912280701754,
+      "specificity": 0.9866666666666667,
+      "cost": 1.0
+    },
+    {
+      "seed": 77,
+      "selected_threshold": 0.33,
+      "threshold": 0.33,
+      "tn": 72,
+      "fp": 3,
+      "fn": 0,
+      "tp": 210,
+      "precision": 0.9859154929577465,
+      "recall": 1.0,
+      "f1": 0.9929078014184397,
+      "accuracy": 0.9894736842105263,
+      "specificity": 0.96,
+      "cost": 3.0
+    },
+    {
+      "seed": 123,
+      "selected_threshold": 0.35000000000000003,
+      "threshold": 0.35000000000000003,
+      "tn": 74,
+      "fp": 1,
+      "fn": 0,
+      "tp": 210,
+      "precision": 0.995260663507109,
+      "recall": 1.0,
+      "f1": 0.997624703087886,
+      "accuracy": 0.9964912280701754,
+      "specificity": 0.9866666666666667,
+      "cost": 1.0
+    },
+    {
+      "seed": 202,
+      "selected_threshold": 0.4000000000000001,
+      "threshold": 0.4000000000000001,
+      "tn": 74,
+      "fp": 1,
+      "fn": 0,
+      "tp": 210,
+      "precision": 0.995260663507109,
+      "recall": 1.0,
+      "f1": 0.997624703087886,
+      "accuracy": 0.9964912280701754,
+      "specificity": 0.9866666666666667,
+      "cost": 1.0
+    }
+  ],
+  "summary": {
+    "n_successful_runs": 5,
+    "fn_mean": 0.0,
+    "fn_std": 0.0,
+    "fn_min": 0,
+    "fn_max": 0,
+    "fp_mean": 1.4,
+    "cost_mean": 1.4
+  }
+}

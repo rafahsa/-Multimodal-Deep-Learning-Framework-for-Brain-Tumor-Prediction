@@ -154,7 +154,8 @@ except ImportError:
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from utils.dataset_mil import MILSliceDataset, get_all_labels
+from utils.dataset_mil_roi import MILSliceDatasetROI as MILSliceDataset
+from utils.dataset_mil import get_all_labels
 from utils.class_balancing import get_weighted_sampler
 from utils.augmentations_2d import get_mil_slice_transforms, normalize_slice
 from models.dual_stream_mil import create_dual_stream_mil
@@ -509,10 +510,134 @@ def get_adaptive_reg_weight(epoch: int, total_epochs: int, base_weight: float,
     return max(min_weight, weight)
 
 
+class AsymmetricBCELoss(nn.Module):
+    """
+    Asymmetric Binary Cross-Entropy Loss for medical classification.
+    
+    Penalizes false negatives (missed HGG cases) more heavily than false positives.
+    This is critical for medical screening where missing a positive case is worse
+    than a false alarm.
+    
+    Formula:
+        loss = -[pos_weight * y * log(p) + (1-y) * log(1-p)]
+    
+    Where pos_weight > 1.0 increases penalty for false negatives.
+    """
+    def __init__(self, pos_weight: float = 3.0, reduction: str = 'mean'):
+        """
+        Args:
+            pos_weight: Multiplier for positive class (HGG). 
+                       Higher values penalize false negatives more.
+                       Recommended: 3.0-5.0 for medical screening.
+            reduction: 'mean', 'sum', or 'none'
+        """
+        super().__init__()
+        self.pos_weight = pos_weight
+        self.reduction = reduction
+    
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            logits: (B, 2) logits for binary classification
+            targets: (B,) binary labels (0=LGG, 1=HGG)
+        
+        Returns:
+            Scalar loss (if reduction='mean' or 'sum') or (B,) tensor (if 'none')
+        """
+        # Convert to probabilities
+        probs = torch.softmax(logits, dim=1)
+        # Get probability of positive class (HGG)
+        p_pos = probs[:, 1]  # (B,)
+        
+        # Binary cross-entropy with asymmetric weighting
+        # For positive samples (y=1): -pos_weight * log(p_pos)
+        # For negative samples (y=0): -log(1-p_pos)
+        pos_mask = (targets == 1).float()
+        neg_mask = (targets == 0).float()
+        
+        loss_pos = -self.pos_weight * pos_mask * torch.log(p_pos + 1e-10)
+        loss_neg = -neg_mask * torch.log(1 - p_pos + 1e-10)
+        
+        loss = loss_pos + loss_neg
+        
+        if self.reduction == 'mean':
+            return loss.mean()
+        elif self.reduction == 'sum':
+            return loss.sum()
+        else:
+            return loss
+
+
+class FocalLoss(nn.Module):
+    """
+    Focal Loss for addressing class imbalance and hard examples.
+    
+    Focal loss down-weights easy examples and focuses on hard examples.
+    Particularly useful when there are many easy negatives.
+    
+    Formula:
+        loss = -alpha * (1-p)^gamma * log(p)  for positive class
+        loss = -(1-alpha) * p^gamma * log(1-p)  for negative class
+    
+    Where:
+        - alpha: Class weighting factor (0-1)
+        - gamma: Focusing parameter (typically 2.0)
+    """
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0, pos_weight: float = 1.0, reduction: str = 'mean'):
+        """
+        Args:
+            alpha: Class weighting factor (default: 0.25, standard for binary classification)
+            gamma: Focusing parameter. Higher values focus more on hard examples (default: 2.0)
+            pos_weight: Additional multiplier for positive class to penalize FN (default: 1.0)
+            reduction: 'mean', 'sum', or 'none'
+        """
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.pos_weight = pos_weight
+        self.reduction = reduction
+    
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            logits: (B, 2) logits for binary classification
+            targets: (B,) binary labels (0=LGG, 1=HGG)
+        
+        Returns:
+            Scalar loss (if reduction='mean' or 'sum') or (B,) tensor (if 'none')
+        """
+        # Convert to probabilities
+        probs = torch.softmax(logits, dim=1)
+        p_pos = probs[:, 1]  # (B,)
+        p_neg = probs[:, 0]  # (B,)
+        
+        # Focal loss terms
+        pos_mask = (targets == 1).float()
+        neg_mask = (targets == 0).float()
+        
+        # For positive class: -alpha * (1-p_pos)^gamma * log(p_pos)
+        # Apply pos_weight multiplier for additional FN penalty
+        focal_pos = -self.alpha * self.pos_weight * pos_mask * \
+                    torch.pow(1 - p_pos, self.gamma) * torch.log(p_pos + 1e-10)
+        
+        # For negative class: -(1-alpha) * p_neg^gamma * log(1-p_pos)
+        focal_neg = -(1 - self.alpha) * neg_mask * \
+                    torch.pow(p_neg, self.gamma) * torch.log(1 - p_pos + 1e-10)
+        
+        loss = focal_pos + focal_neg
+        
+        if self.reduction == 'mean':
+            return loss.mean()
+        elif self.reduction == 'sum':
+            return loss.sum()
+        else:
+            return loss
+
+
 def train_epoch(model, train_loader, loss_fn, optimizer, device, scaler, epoch, logger, 
                 grad_clip=0.0, gradient_accumulation_steps=1, ema_model=None, ema_decay=0.0,
                 temperature=1.0, reg_weight_entropy=0.0, reg_weight_confidence=0.0,
-                class_weight_scale=1.0, label_smoothing=0.1):
+                class_weight_scale=1.0, label_smoothing=0.1, loss_type='ce'):
     """
     Train for one epoch with temperature annealing and instance-level regularization.
     
@@ -560,7 +685,13 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device, scaler, epoch, 
                 temperature=temperature
             )
             
-            # Bag-level loss with adaptive label smoothing and class weights
+            # Bag-level loss: support multiple loss types
+            if loss_type == 'asymmetric' or loss_type == 'focal':
+                # Asymmetric or Focal loss: use the loss function directly
+                # These losses already handle FN penalty internally
+                bag_loss = loss_fn(logits, labels)
+            else:
+                # Standard CrossEntropyLoss with adaptive label smoothing and class weights
             # Compute loss manually to support adaptive smoothing and class weight scaling
             log_probs = F.log_softmax(logits, dim=1)
             n_classes = logits.size(1)
@@ -838,8 +969,10 @@ def main():
     parser = argparse.ArgumentParser(description='Train Dual-Stream MIL model for brain tumor classification')
     
     # Data args
-    parser.add_argument('--fold', type=int, required=True, choices=[0, 1, 2, 3, 4],
-                       help='Fold number (0-4)')
+    parser.add_argument('--fold', type=int, default=0, choices=[0, 1, 2, 3, 4],
+                       help='Fold number (0-4). Default: 0. Use --single-fold to train only this fold.')
+    parser.add_argument('--single-fold', action='store_true',
+                       help='Train only the specified fold (for rapid prototyping). Default: train all folds.')
     parser.add_argument('--data-root', type=str, default='data/processed/stage_4_resize/train',
                        help='Root directory for processed data')
     parser.add_argument('--splits-dir', type=str, default='splits',
@@ -862,6 +995,14 @@ def main():
                        help='Dropout rate in classification head (default: 0.5, increased from 0.4 for better regularization)')
     parser.add_argument('--use-hidden-layer', action='store_true', default=True,
                        help='Use hidden layer in classification head (default: True)')
+    
+    # Loss function args (for FN penalty)
+    parser.add_argument('--loss-type', type=str, default='ce', choices=['ce', 'asymmetric', 'focal'],
+                       help='Loss function type: ce=CrossEntropyLoss (default), asymmetric=AsymmetricBCE (FN penalty), focal=FocalLoss')
+    parser.add_argument('--pos-weight', type=float, default=3.0,
+                       help='Positive class weight multiplier for asymmetric/focal loss. Higher values penalize false negatives more. Recommended: 3.0-5.0 for medical screening (default: 3.0)')
+    parser.add_argument('--gamma', type=float, default=2.0,
+                       help='Focal loss focusing parameter (gamma). Higher values focus more on hard examples. Only used with --loss-type focal (default: 2.0)')
     
     # Training args
     parser.add_argument('--epochs', type=int, default=60,
@@ -970,9 +1111,21 @@ def main():
     else:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
-    # Create output directories
+    # Single-fold mode: only train the specified fold (for rapid prototyping)
+    if args.single_fold:
+        folds_to_train = [args.fold]
+    else:
+        folds_to_train = [0, 1, 2, 3, 4]
+    
+    # Load datasets
+    data_root = Path(args.data_root)
+    splits_dir = Path(args.splits_dir)
+    
+    # Training loop over folds
+    for current_fold in folds_to_train:
+        # Create output directories (per fold)
     output_dir = Path(args.output_dir)
-    run_dir = output_dir / 'runs' / f'fold_{args.fold}' / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        run_dir = output_dir / 'runs' / f'fold_{current_fold}' / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     run_dir.mkdir(parents=True, exist_ok=True)
     
     checkpoints_dir = run_dir / 'checkpoints'
@@ -984,29 +1137,27 @@ def main():
     predictions_dir = run_dir / 'predictions'
     predictions_dir.mkdir(parents=True, exist_ok=True)
     
-    # Setup logging
+        # Setup logging (per fold)
     logger, log_file = setup_logging(run_dir)
     logger.info("="*80)
     logger.info("Dual-Stream MIL Training Script")
     logger.info("="*80)
-    logger.info(f"Fold: {args.fold}")
+        logger.info(f"Fold: {current_fold}")
     logger.info(f"Output directory: {run_dir}")
     logger.info(f"Log file: {log_file}")
+        logger.info(f"Loss type: {args.loss_type}")
+        if args.loss_type in ['asymmetric', 'focal']:
+            logger.info(f"  Pos weight: {args.pos_weight}")
+            if args.loss_type == 'focal':
+                logger.info(f"  Gamma: {args.gamma}")
+        if args.single_fold:
+            logger.info("  Mode: SINGLE-FOLD (rapid prototyping)")
+        else:
+            logger.info("  Mode: FULL 5-FOLD")
     logger.info("="*80)
     
-    # Save configuration
-    config = vars(args)
-    config['device'] = str(device)
-    config['output_dir'] = str(run_dir)
-    with open(run_dir / 'config.json', 'w') as f:
-        json.dump(config, f, indent=2)
-    
-    # Load datasets
-    data_root = Path(args.data_root)
-    splits_dir = Path(args.splits_dir)
-    
-    train_split_file = splits_dir / f'fold_{args.fold}_train.csv'
-    val_split_file = splits_dir / f'fold_{args.fold}_val.csv'
+        train_split_file = splits_dir / f'fold_{current_fold}_train_with_seg.csv'
+        val_split_file = splits_dir / f'fold_{current_fold}_val_with_seg.csv'
     
     if not train_split_file.exists():
         raise FileNotFoundError(f"Training split file not found: {train_split_file}")
@@ -1022,7 +1173,7 @@ def main():
         data_root=data_root,
         split_file=train_split_file,
         bag_size=args.bag_size,
-        sampling_strategy=args.sampling_strategy,
+            sampling_strategy='roi',  # force ROI sampling for this experiment
         transform=train_aug,
         seed=args.seed
     )
@@ -1062,7 +1213,7 @@ def main():
         pin_memory=True
     )
     
-    # Create model
+        # Create model (per fold)
     logger.info("\n" + "="*60)
     logger.info("Creating Dual-Stream MIL Model")
     logger.info("="*60)
@@ -1083,6 +1234,14 @@ def main():
         logger.info(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
         model = DataParallel(model)
     
+        # Save configuration
+        config = vars(args)
+        config['device'] = str(device)
+        config['output_dir'] = str(run_dir)
+        config['current_fold'] = current_fold
+        with open(run_dir / 'config.json', 'w') as f:
+            json.dump(config, f, indent=2)
+        
     # Compute class weights for loss function (addresses class imbalance)
     class_weights = None
     if args.use_class_weights:
@@ -1111,7 +1270,15 @@ def main():
         args.label_smoothing_start = args.label_smoothing
         args.label_smoothing_end = args.label_smoothing
     
-    # Loss function: CrossEntropyLoss with adaptive label smoothing and class weights (anti-overfitting)
+        # Loss function: Support multiple types for FN penalty
+        if args.loss_type == 'asymmetric':
+            loss_fn = AsymmetricBCELoss(pos_weight=args.pos_weight, reduction='mean')
+            logger.info(f"Loss function: AsymmetricBCELoss (pos_weight={args.pos_weight}, penalizes FN {args.pos_weight}x more than FP)")
+        elif args.loss_type == 'focal':
+            loss_fn = FocalLoss(alpha=0.25, gamma=args.gamma, pos_weight=args.pos_weight, reduction='mean')
+            logger.info(f"Loss function: FocalLoss (alpha=0.25, gamma={args.gamma}, pos_weight={args.pos_weight})")
+        else:
+            # Standard CrossEntropyLoss with adaptive label smoothing and class weights (anti-overfitting)
     # Problem: Model becomes overconfident (logits → ±∞) → poor generalization + class imbalance
     # Solution: Adaptive label smoothing (high early, low late) prevents early overconfidence and late instability
     # Note: We create a base loss function, but actual smoothing/weights are applied adaptively in train_epoch
@@ -1121,7 +1288,8 @@ def main():
         weight=class_weights  # Base weights, will be scaled adaptively
     )
     logger.info(f"Loss function: CrossEntropyLoss (adaptive label_smoothing: {args.label_smoothing_start} → {args.label_smoothing_end}, class_weights={'enabled' if class_weights is not None else 'disabled'})")
-    logger.info(f"Class balancing: WeightedRandomSampler (data-level) + Adaptive class weights (loss-level, decay after {args.class_weight_warmup_epochs} epochs)")
+        
+        logger.info(f"Class balancing: WeightedRandomSampler (data-level)" + (f" + Adaptive class weights (loss-level, decay after {args.class_weight_warmup_epochs} epochs)" if args.loss_type == 'ce' else ""))
     logger.info(f"Instance-level regularization: base entropy_weight={args.reg_weight_entropy}, base confidence_weight={args.reg_weight_confidence} (adaptive decay from epoch {args.reg_weight_decay_start})")
     logger.info(f"Temperature annealing: {args.temperature_start} → {args.temperature_end} (schedule: {args.temperature_schedule}, faster decay early)")
     logger.info("")
@@ -1352,7 +1520,8 @@ def main():
             reg_weight_entropy=current_reg_entropy,
             reg_weight_confidence=current_reg_confidence,
             class_weight_scale=class_weight_scale,
-            label_smoothing=current_label_smoothing
+            label_smoothing=current_label_smoothing,
+            loss_type=args.loss_type
         )
         
         # Validate with final temperature (use temperature_end for evaluation)
@@ -1644,6 +1813,7 @@ def main():
     logger.info("=" * 80)
     logger.info("FINAL EVALUATION METRICS (Best Checkpoint):")
     logger.info("=" * 80)
+        logger.info(f"  Fold:             {current_fold}")
     logger.info(f"  Checkpoint used:   {checkpoint_path.name}")
     logger.info(f"  Model type:        {'EMA' if use_ema else 'Regular'}")
     logger.info(f"  Checkpoint epoch:  {checkpoint_epoch}")
@@ -1658,6 +1828,10 @@ def main():
     logger.info("")
     logger.info(f"Results saved to: {run_dir}")
     logger.info("=" * 80)
+        
+        # If single-fold mode, break after first fold
+        if args.single_fold:
+            break
 
 
 if __name__ == "__main__":

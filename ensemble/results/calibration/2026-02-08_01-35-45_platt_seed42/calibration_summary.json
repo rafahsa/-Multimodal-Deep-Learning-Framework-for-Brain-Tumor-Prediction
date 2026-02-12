@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-02-08_01-35-45",
+  "calibration_mode": "platt",
+  "split_seed": 42,
+  "n_calibration": 185,
+  "n_threshold_selection": 100,
+  "brier_pre": 0.1295388397756976,
+  "brier_post": 0.10460934063792672,
+  "ece_pre": 0.11438223825546578,
+  "ece_post": 0.04919463939962526,
+  "improvement_brier": 0.024929499137770886,
+  "improvement_ece": 0.06518759885584052,
+  "args": {
+    "calibration_fraction": 0.65,
+    "recall_target": 0.94,
+    "sweep_start": 0.05,
+    "sweep_end": 0.95,
+    "sweep_step": 0.01,
+    "n_bins": 10
+  }
+}

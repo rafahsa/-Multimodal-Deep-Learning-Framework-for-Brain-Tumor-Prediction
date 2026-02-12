@@ -1,0 +1,78 @@
+{
+  "threshold": 0.22,
+  "accuracy": 0.8421052631578947,
+  "precision": 0.8985507246376812,
+  "recall": 0.8857142857142857,
+  "f1_score": 0.8920863309352518,
+  "auc_roc": 0.9067936507936508,
+  "confusion_matrix": [
+    [
+      54,
+      21
+    ],
+    [
+      24,
+      186
+    ]
+  ],
+  "tn": 54,
+  "fp": 21,
+  "fn": 24,
+  "tp": 186,
+  "classification_report": {
+    "0": {
+      "precision": 0.6923076923076923,
+      "recall": 0.72,
+      "f1-score": 0.7058823529411765,
+      "support": 75.0
+    },
+    "1": {
+      "precision": 0.8985507246376812,
+      "recall": 0.8857142857142857,
+      "f1-score": 0.8920863309352518,
+      "support": 210.0
+    },
+    "accuracy": 0.8421052631578947,
+    "macro avg": {
+      "precision": 0.7954292084726867,
+      "recall": 0.8028571428571428,
+      "f1-score": 0.7989843419382141,
+      "support": 285.0
+    },
+    "weighted avg": {
+      "precision": 0.8442762424455789,
+      "recall": 0.8421052631578947,
+      "f1-score": 0.8430852840947056,
+      "support": 285.0
+    }
+  },
+  "model_coefficients": {
+    "hgg_prob_resnet": 0.5520911015976938,
+    "hgg_prob_swin": 4.1458740686630735,
+    "mil_prob": 0.020900259987247753
+  },
+  "model_intercept": -2.063348309361144,
+  "feature_importance": {
+    "hgg_prob_resnet": 0.5520911015976938,
+    "hgg_prob_swin": 4.1458740686630735,
+    "mil_prob": 0.020900259987247753
+  },
+  "metadata": {
+    "model_type": "LogisticRegression",
+    "variant": "ROI_MIL",
+    "evaluation_date": "2026-02-11T03:45:16.101171",
+    "threshold": 0.22,
+    "dataset": "OOF predictions with ROI MIL (validation data from cross-validation)",
+    "features": [
+      "hgg_prob_resnet",
+      "hgg_prob_swin",
+      "mil_prob"
+    ],
+    "target": "label",
+    "n_samples": 285,
+    "class_distribution": {
+      "LGG": 75,
+      "HGG": 210
+    }
+  }
+}

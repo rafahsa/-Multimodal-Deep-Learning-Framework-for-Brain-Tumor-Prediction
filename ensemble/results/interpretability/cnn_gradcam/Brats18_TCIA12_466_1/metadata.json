@@ -1,0 +1,12 @@
+{
+  "patient_id": "Brats18_TCIA12_466_1",
+  "class": "LGG",
+  "predicted_class": 1,
+  "predicted_class_name": "HGG",
+  "probabilities": {
+    "LGG": 0.275780588388443,
+    "HGG": 0.7242193818092346
+  },
+  "target_class": 1,
+  "target_class_name": "HGG"
+}

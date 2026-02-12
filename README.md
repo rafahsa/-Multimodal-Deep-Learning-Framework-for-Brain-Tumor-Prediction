@@ -180,6 +180,14 @@ See `docs/stage_entropy_mil.md` for detailed documentation.
 
 The ensemble meta-learner uses configurable decision thresholds for binary classification (LGG=0, HGG=1). We select **0.22 as the default operating threshold for the main system (best F1, balanced precision/recall)**. We provide **0.19 as a high-sensitivity operating point to reduce false negatives in HGG detection**.
 
+### Probability Calibration
+
+We applied **post-hoc Platt probability calibration** to improve the reliability of ensemble predictions. Calibration significantly reduced Brier score (0.119 → 0.099, improvement: 0.021) and Expected Calibration Error (ECE: 0.119 → 0.087, improvement: 0.032) **without degrading classification performance**. Operating thresholds were re-selected on calibrated probabilities using a held-out validation set (30% of OOF predictions, seed=42) to prevent data leakage.
+
+**Calibration is optional at inference time** via the `--calibration-mode` flag. Default inference remains uncalibrated for backward compatibility. When calibration is enabled, use the re-selected thresholds:
+- **Balanced (calibrated)**: threshold = 0.41 (Precision=0.9365, Recall=0.9365, F1=0.9365, FN=4, FP=4)
+- **High-sensitivity (calibrated)**: threshold = 0.38 (Precision=0.9091, Recall=0.9524, F1=0.9302, FN=3, FP=6)
+
 ### Operating Points
 
 | Threshold | Precision | Recall | F1 | Accuracy | FN | FP | Use Case |
@@ -205,7 +213,12 @@ python scripts/ensemble/test_ensemble_on_new_patients.py --threshold 0.19
 python scripts/ensemble/test_ensemble_on_new_patients.py --threshold 0.50
 ```
 
-The inference script defaults to threshold 0.22 if no `--threshold` argument is provided.
+**With probability calibration (Platt scaling):**
+```bash
+python scripts/ensemble/test_ensemble_on_new_patients.py --calibration-mode platt --threshold 0.41
+```
+
+The inference script defaults to threshold 0.22 if no `--threshold` argument is provided. Calibration is disabled by default (`--calibration-mode none`) for backward compatibility.
 
 ## Usage
 

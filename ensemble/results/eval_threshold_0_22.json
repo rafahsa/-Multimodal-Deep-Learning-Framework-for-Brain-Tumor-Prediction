@@ -1,71 +1,71 @@
 {
   "threshold": 0.22,
-  "accuracy": 0.8526315789473684,
-  "precision": 0.9,
-  "recall": 0.9,
-  "f1_score": 0.9,
-  "auc_roc": 0.9126349206349207,
+  "accuracy": 0.8456140350877193,
+  "precision": 0.8990384615384616,
+  "recall": 0.8904761904761904,
+  "f1_score": 0.8947368421052632,
+  "auc_roc": 0.9074285714285714,
   "confusion_matrix": [
     [
       54,
       21
     ],
     [
-      21,
-      189
+      23,
+      187
     ]
   ],
   "tn": 54,
   "fp": 21,
-  "fn": 21,
-  "tp": 189,
+  "fn": 23,
+  "tp": 187,
   "classification_report": {
     "0": {
-      "precision": 0.72,
+      "precision": 0.7012987012987013,
       "recall": 0.72,
-      "f1-score": 0.72,
+      "f1-score": 0.7105263157894737,
       "support": 75.0
     },
     "1": {
-      "precision": 0.9,
-      "recall": 0.9,
-      "f1-score": 0.9,
+      "precision": 0.8990384615384616,
+      "recall": 0.8904761904761904,
+      "f1-score": 0.8947368421052632,
       "support": 210.0
     },
-    "accuracy": 0.8526315789473684,
+    "accuracy": 0.8456140350877193,
     "macro avg": {
-      "precision": 0.81,
-      "recall": 0.81,
-      "f1-score": 0.81,
+      "precision": 0.8001685814185815,
+      "recall": 0.8052380952380952,
+      "f1-score": 0.8026315789473684,
       "support": 285.0
     },
     "weighted avg": {
-      "precision": 0.8526315789473684,
-      "recall": 0.8526315789473684,
-      "f1-score": 0.8526315789473684,
+      "precision": 0.8470016825279983,
+      "recall": 0.8456140350877193,
+      "f1-score": 0.8462603878116343,
       "support": 285.0
     }
   },
   "model_coefficients": {
-    "hgg_prob_resnet": 0.5369824605736153,
-    "hgg_prob_swin": 4.063425042195521,
-    "hgg_prob_mil": 0.8900130196449593
+    "hgg_prob_resnet": 0.5610322729776156,
+    "hgg_prob_swin": 4.137672878106574,
+    "mil_prob": 0.09257043025237606
   },
-  "model_intercept": -2.404859450627464,
+  "model_intercept": -2.1205021782417655,
   "feature_importance": {
-    "hgg_prob_resnet": 0.5369824605736153,
-    "hgg_prob_swin": 4.063425042195521,
-    "hgg_prob_mil": 0.8900130196449593
+    "hgg_prob_resnet": 0.5610322729776156,
+    "hgg_prob_swin": 4.137672878106574,
+    "mil_prob": 0.09257043025237606
   },
   "metadata": {
     "model_type": "LogisticRegression",
-    "evaluation_date": "2026-02-06T18:57:58.967305",
+    "evaluation_date": "2026-02-09T23:31:36.962068",
     "threshold": 0.22,
     "dataset": "OOF predictions (validation data from cross-validation)",
     "features": [
       "hgg_prob_resnet",
       "hgg_prob_swin",
-      "hgg_prob_mil"
+      "mil_prob"
     ],
     "target": "label",
     "n_samples": 285,

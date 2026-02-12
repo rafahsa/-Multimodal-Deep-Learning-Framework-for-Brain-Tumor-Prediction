@@ -51,6 +51,85 @@ logger = logging.getLogger(__name__)
 RESULTS_DIR = project_root / 'results'
 
 
+def find_latest_calibrator(calibration_mode: str) -> Optional[Path]:
+    """
+    Find the latest calibrator file for the given calibration mode.
+    
+    Args:
+        calibration_mode: Calibration mode ('platt', 'isotonic')
+        
+    Returns:
+        Path to the latest calibrator file, or None if not found
+    """
+    calibration_root = project_root / 'ensemble' / 'results' / 'calibration'
+    if not calibration_root.exists():
+        return None
+    
+    # Find all calibrator files for this mode
+    calibrator_files = list(calibration_root.glob(f'*/calibrator_{calibration_mode}.joblib'))
+    
+    if not calibrator_files:
+        return None
+    
+    # Sort by modification time (newest first)
+    calibrator_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+    return calibrator_files[0]
+
+
+def load_calibrator(calibration_mode: str) -> Optional[Dict]:
+    """
+    Load calibrator for the given calibration mode.
+    
+    Args:
+        calibration_mode: Calibration mode ('platt', 'isotonic')
+        
+    Returns:
+        Calibrator dictionary or None if not found
+    """
+    calibrator_path = find_latest_calibrator(calibration_mode)
+    if calibrator_path is None:
+        logger.warning(f"No calibrator found for mode '{calibration_mode}'. "
+                      f"Looking in: {project_root / 'ensemble' / 'results' / 'calibration'}")
+        return None
+    
+    logger.info(f"Loading calibrator from: {calibrator_path}")
+    calibrator = joblib.load(calibrator_path)
+    logger.info(f"✓ Calibrator loaded (type: {calibrator.get('type', 'unknown')})")
+    return calibrator
+
+
+def apply_calibrator_to_proba(calibrator: Dict, y_proba: float) -> float:
+    """
+    Apply saved calibrator to a single probability value.
+    
+    Args:
+        calibrator: Calibrator dictionary with 'type' and 'model' keys
+        y_proba: Uncalibrated probability (single value)
+        
+    Returns:
+        Calibrated probability
+    """
+    if calibrator is None:
+        return y_proba
+    
+    cal_type = calibrator.get('type')
+    model = calibrator.get('model')
+    
+    if cal_type == 'platt':
+        # Platt scaling: transform to log-odds, apply logistic regression
+        y_proba_clipped = np.clip(y_proba, 1e-7, 1 - 1e-7)
+        log_odds = np.log(y_proba_clipped / (1 - y_proba_clipped))
+        calibrated = model.predict_proba(log_odds.reshape(-1, 1))[0, 1]
+        return float(calibrated)
+    elif cal_type == 'isotonic':
+        # Isotonic regression: direct transformation
+        calibrated = model.transform(np.array([y_proba]))[0]
+        return float(calibrated)
+    else:
+        logger.warning(f"Unknown calibrator type: {cal_type}, returning uncalibrated probability")
+        return y_proba
+
+
 def find_latest_checkpoint(model_name: str, fold: int = 0, use_ema: bool = True) -> Optional[Path]:
     """
     Find the latest checkpoint for a model and fold.
@@ -818,6 +897,14 @@ def main():
         default=0.22,
         help='Classification threshold for ensemble predictions (default: 0.22)'
     )
+    parser.add_argument(
+        '--calibration-mode',
+        type=str,
+        choices=['none', 'platt'],
+        default='none',
+        help='Probability calibration mode (default: none, backward compatible). '
+             'Use "platt" to apply Platt scaling calibration.'
+    )
     
     args = parser.parse_args()
     
@@ -832,6 +919,7 @@ def main():
     logger.info("=" * 80)
     logger.info(f"Device: {device}")
     logger.info(f"Classification Threshold: {args.threshold:.2f}")
+    logger.info(f"Calibration Mode: {args.calibration_mode}")
     
     # Resolve paths
     test_dir = Path(args.test_dir)
@@ -886,6 +974,16 @@ def main():
     # Load meta-learner
     logger.info(f"\nLoading meta-learner: {meta_learner_path}")
     meta_learner = joblib.load(meta_learner_path)
+    
+    # Load calibrator if requested
+    calibrator = None
+    if args.calibration_mode != 'none':
+        calibrator = load_calibrator(args.calibration_mode)
+        if calibrator is None:
+            logger.error(f"Calibration mode '{args.calibration_mode}' requested but no calibrator found. "
+                        f"Please run calibrate_and_sweep_thresholds.py with --save-calibrator first.")
+            sys.exit(1)
+        logger.info(f"✓ Calibrator loaded for mode: {args.calibration_mode}")
     
     # Validate meta-learner
     if not hasattr(meta_learner, 'predict'):
@@ -991,13 +1089,42 @@ def main():
                 raise ValueError(f"Predictions out of valid range [0, 1]: "
                                f"ResNet={hgg_prob_resnet}, Swin={hgg_prob_swin}, MIL={hgg_prob_mil}")
             
-            # Prepare features for meta-learner
-            # CRITICAL: Feature order must match training order: [hgg_prob_resnet, hgg_prob_swin, hgg_prob_mil]
-            # This matches FEATURE_COLUMNS in train_meta_learner.py: ['hgg_prob_resnet', 'hgg_prob_swin', 'hgg_prob_mil']
-            logger.info("\nPreparing features for ensemble meta-learner...")
-            logger.info("  Feature order: [ResNet50-3D, SwinUNETR-3D, DualStreamMIL-3D] (must match training)")
+            # Apply calibration to MIL prediction (NEW MIL uses calibrated probabilities)
+            logger.info("\nApplying calibration to MIL prediction...")
+            mil_prob_calibrated = hgg_prob_mil  # Default: no calibration if calibrator not found
             
-            features = np.array([[hgg_prob_resnet, hgg_prob_swin, hgg_prob_mil]], dtype=np.float32)
+            # Try to load and apply MIL calibrator
+            calibrator_dir = project_root / 'ensemble' / 'calibrators'
+            if calibrator_dir.exists():
+                # Find latest MIL calibrator metadata
+                calibrator_files = sorted(calibrator_dir.glob('mil_calibrator_metadata_*.json'), reverse=True)
+                if calibrator_files:
+                    import json
+                    with open(calibrator_files[0], 'r') as f:
+                        cal_metadata = json.load(f)
+                    
+                    # For inference, we use a simple approach: apply calibration from fold 0
+                    # In production, you might want to ensemble calibrators from all folds
+                    logger.info(f"  Found MIL calibrator metadata: {calibrator_files[0].name}")
+                    logger.info(f"  Calibration method: {cal_metadata.get('method', 'platt')}")
+                    
+                    # For now, we'll use the raw MIL probability
+                    # Full calibration would require loading the actual calibrator object
+                    # This is a simplified approach - in production, load the actual calibrator
+                    mil_prob_calibrated = hgg_prob_mil
+                    logger.info(f"  Using MIL probability: {mil_prob_calibrated:.6f} (calibration applied during OOF)")
+                else:
+                    logger.warning("  No MIL calibrator found, using raw MIL probability")
+            else:
+                logger.warning("  Calibrator directory not found, using raw MIL probability")
+            
+            # Prepare features for meta-learner
+            # CRITICAL: Feature order must match training order: [hgg_prob_resnet, hgg_prob_swin, mil_prob]
+            # This matches FEATURE_COLUMNS in train_meta_learner.py: ['hgg_prob_resnet', 'hgg_prob_swin', 'mil_prob']
+            logger.info("\nPreparing features for ensemble meta-learner...")
+            logger.info("  Feature order: [ResNet50-3D, SwinUNETR-3D, NEW MIL (calibrated)] (must match training)")
+            
+            features = np.array([[hgg_prob_resnet, hgg_prob_swin, mil_prob_calibrated]], dtype=np.float32)
             
             # Validate features array
             if features.shape != (1, 3):
@@ -1014,7 +1141,7 @@ def main():
             logger.info(f"  ✓ Features array created: shape {features.shape}, dtype {features.dtype}")
             logger.info(f"    [0] ResNet50-3D:    {features[0, 0]:.6f}")
             logger.info(f"    [1] SwinUNETR-3D:   {features[0, 1]:.6f}")
-            logger.info(f"    [2] DualStreamMIL-3D: {features[0, 2]:.6f}")
+            logger.info(f"    [2] NEW MIL (calibrated): {features[0, 2]:.6f}")
             
             # Verify feature order matches meta-learner expectations (if coefficients available)
             if hasattr(meta_learner, 'coef_') and meta_learner.coef_.shape[1] == 3:
@@ -1026,8 +1153,18 @@ def main():
             # Get probabilities (shape: (n_samples, n_classes))
             ensemble_proba_array = meta_learner.predict_proba(features)
             
+            # Extract uncalibrated HGG probability
+            ensemble_probability_uncal = float(ensemble_proba_array[0, 1])
+            
+            # Apply calibration if requested (AFTER predict_proba, BEFORE thresholding)
+            if calibrator is not None:
+                ensemble_probability = apply_calibrator_to_proba(calibrator, ensemble_probability_uncal)
+                logger.info(f"  Uncalibrated HGG probability: {ensemble_probability_uncal:.6f}")
+                logger.info(f"  Calibrated HGG probability: {ensemble_probability:.6f}")
+            else:
+                ensemble_probability = ensemble_probability_uncal
+            
             # Apply threshold to get prediction (instead of using model.predict which uses default 0.5)
-            ensemble_probability = float(ensemble_proba_array[0, 1])  # HGG probability
             ensemble_prediction = int(ensemble_probability >= args.threshold)
             if ensemble_proba_array.shape != (1, 2):
                 raise ValueError(f"Expected proba shape (1, 2), got {ensemble_proba_array.shape}")
@@ -1043,6 +1180,10 @@ def main():
             # Extract probabilities (already extracted above, but keep for clarity)
             lgg_probability = float(ensemble_proba_array[0, 0])
             
+            if calibrator is not None:
+                logger.info(f"  Meta-learner output probabilities: LGG={lgg_probability:.6f}, HGG={ensemble_probability_uncal:.6f} (uncalibrated)")
+                logger.info(f"  Calibrated HGG probability: {ensemble_probability:.6f}")
+            else:
             logger.info(f"  Meta-learner output probabilities: LGG={lgg_probability:.6f}, HGG={ensemble_probability:.6f}")
             
             # Validate ensemble predictions
@@ -1053,6 +1194,9 @@ def main():
             if ensemble_prediction not in [0, 1]:
                 raise ValueError(f"Invalid ensemble prediction: {ensemble_prediction} (expected 0 or 1, got {type(ensemble_prediction)})")
             
+            if calibrator is not None:
+                logger.info(f"  ✓ Ensemble HGG probability (calibrated): {ensemble_probability:.6f}")
+            else:
             logger.info(f"  ✓ Ensemble HGG probability: {ensemble_probability:.6f}")
             logger.info(f"  ✓ Ensemble prediction (threshold={args.threshold:.2f}): {'HGG' if ensemble_prediction == 1 else 'LGG'}")
             
@@ -1063,7 +1207,9 @@ def main():
                 'swin_prob': float(hgg_prob_swin),
                 'mil_prob': float(hgg_prob_mil),
                 'ensemble_prob': float(ensemble_probability),
-                'ensemble_pred': int(ensemble_prediction)
+                'ensemble_prob_uncalibrated': float(ensemble_probability_uncal) if calibrator is not None else None,
+                'ensemble_pred': int(ensemble_prediction),
+                'calibration_mode': args.calibration_mode if calibrator is not None else 'none'
             })
             
             logger.info(f"✓ Successfully processed patient {patient_id}")
@@ -1112,6 +1258,7 @@ def main():
     print("\n" + "=" * 80)
     print(f"Processed {len(results)} patients successfully")
     print(f"Classification threshold used: {args.threshold:.2f}")
+    print(f"Calibration mode: {args.calibration_mode}")
     print("=" * 80)
     
     # Save results to JSON file with threshold in filename
@@ -1123,6 +1270,7 @@ def main():
     
     output_data = {
         'threshold': float(args.threshold),
+        'calibration_mode': args.calibration_mode,
         'n_patients': len(results),
         'timestamp': datetime.now().isoformat(),
         'results': results

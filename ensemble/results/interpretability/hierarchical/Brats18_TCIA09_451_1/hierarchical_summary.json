@@ -1,0 +1,33 @@
+{
+  "patient_id": "Brats18_TCIA09_451_1",
+  "true_label": "LGG",
+  "predicted_label": "LGG",
+  "cnn_peak_slice": 48,
+  "cnn_overlap_info": {
+    "cnn_overlap_available": true,
+    "cnn_roi_overlap_ratio": 0.023026407900528786,
+    "high_cam_voxels": 892801,
+    "overlap_voxels": 20558,
+    "threshold": 0.5770298838615417,
+    "threshold_percentile": 90.0
+  },
+  "mil_top_k_slices": [
+    124,
+    120,
+    0,
+    4,
+    116,
+    112,
+    108,
+    104,
+    8,
+    100
+  ],
+  "roi_slice_range": {
+    "min": 42,
+    "max": 103
+  },
+  "mil_roi_overlap_ratio": 0.1,
+  "cnn_roi_overlap_ratio": 0.023026407900528786,
+  "aligned": false
+}

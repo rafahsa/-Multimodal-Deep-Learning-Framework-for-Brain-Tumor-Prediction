@@ -1,0 +1,71 @@
+{
+  "tumor_coverage": {
+    "mean": 0.012653388977050782,
+    "median": 0.001882791519165039,
+    "pct_high_coverage": 0.0,
+    "pct_medium_coverage": 0.0,
+    "pct_low_coverage": 1.0,
+    "has_masks": true
+  },
+  "roi_size": {
+    "mean_voxels": 2097152.0,
+    "pct_small": 0.0
+  },
+  "empty_roi": {
+    "pct_empty": 0.0
+  },
+  "leakage": {
+    "leakage_risk": "low",
+    "reason": "ROI uses segmentation masks (tumor regions), but segmentation is not label-dependent (it's anatomical, not diagnostic)",
+    "found_patterns": [
+      [
+        "class",
+        10,
+        "python scripts/preprocessing/run_stage3_crop.py --split train --classes HGG LGG "
+      ],
+      [
+        "class",
+        11,
+        "python scripts/preprocessing/run_stage3_crop.py --split train --classes HGG --dr"
+      ],
+      [
+        "class",
+        307,
+        "class_name: str,"
+      ],
+      [
+        "class",
+        324,
+        "output_path = output_root / split / class_name / patient_id / f\"{patient_id}_{mo"
+      ],
+      [
+        "class",
+        430,
+        "classes: List[str]"
+      ]
+    ]
+  },
+  "redundancy": {
+    "correlation": 0.14700403405541432,
+    "n_samples": 285,
+    "swin_wrong_mil_correct": 53,
+    "mil_wrong_swin_correct": 73,
+    "swin_fn_count": 53,
+    "mil_fn_count": 0,
+    "swin_fn_mil_tp": 53,
+    "swin_fn_patients": [
+      "Brats18_2013_10_1",
+      "Brats18_2013_11_1",
+      "Brats18_2013_12_1",
+      "Brats18_2013_13_1",
+      "Brats18_2013_14_1",
+      "Brats18_2013_19_1",
+      "Brats18_2013_21_1",
+      "Brats18_2013_23_1",
+      "Brats18_2013_25_1",
+      "Brats18_2013_26_1"
+    ]
+  },
+  "decision": "NO_GO",
+  "decision_reason": "Mean coverage 1.3% < 40% - ROI quality too low"
+}

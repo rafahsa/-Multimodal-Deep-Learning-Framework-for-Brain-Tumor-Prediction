@@ -1,0 +1,95 @@
+================================================================================
+MIL MODEL COMPARISON REPORT: OLD vs NEW (Entropy-Based Sampling)
+================================================================================
+
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Decision: CONDITIONAL
+Confidence: medium
+
+The NEW MIL model shows promise but needs improvements before replacing OLD MIL.
+
+KEY FINDINGS
+--------------------------------------------------------------------------------
+✓ Recall improved by 0.3000 (0.2238 → 0.5238)
+✓ False negatives REDUCED by 63 (163 → 100)
+✓ More HGG cases with high confidence (≥0.7): 34 → 67
+
+CONCERNS
+--------------------------------------------------------------------------------
+⚠ ROC-AUC decreased by 0.1090
+⚠ PR-AUC decreased by 0.0349
+⚠ Probability range narrowed by 0.2737
+
+
+================================================================================
+DETAILED METRICS COMPARISON
+================================================================================
+
+Performance Metrics @ Threshold 0.5
+--------------------------------------------------------------------------------
+Metric               OLD MIL         NEW MIL         Delta          
+--------------------------------------------------------------------------------
+roc_auc              0.7303          0.6213          -0.1090
+pr_auc               0.8780          0.8431          -0.0349
+precision            0.8868          0.7857          -0.1011
+recall               0.2238          0.5238          +0.3000
+f1                   0.3574          0.6286          +0.2712
+fn_count             163             100             -63
+fp_count             6               30              +24
+
+================================================================================
+SIGNAL QUALITY ANALYSIS
+================================================================================
+
+Probability Distribution Statistics
+--------------------------------------------------------------------------------
+Statistic                 OLD MIL              NEW MIL              Delta          
+--------------------------------------------------------------------------------
+mean                      0.4847               0.5426               +0.0579
+std                       0.1527               0.1570               +0.0042
+min                       0.1113               0.3079               +0.1966
+max                       0.9497               0.8726               -0.0771
+range_width               0.8384               0.5647               -0.2737
+separation                0.0969               0.0511               -0.0458
+hgg_mean                  0.5102               0.5560               +0.0458
+lgg_mean                  0.4133               0.5049               +0.0916
+
+================================================================================
+RECOMMENDATION & NEXT STEPS
+================================================================================
+
+Decision: CONDITIONAL
+Confidence Level: medium
+
+Suggested Improvements:
+--------------------------------------------------------------------------------
+
+1. Recall
+   Issue: Recall is 0.524, should be >0.85 for medical use
+   Suggestion: Adjust loss function to penalize false negatives more, or use class weights
+   Expected Effect: Higher recall, fewer missed HGG cases
+
+2. Confidence on HGG
+   Issue: 100 HGG cases have low confidence (<0.5)
+   Suggestion: Improve instance sampling to focus on discriminative patches, or increase bag size
+   Expected Effect: Higher confidence on true positives
+
+3. Class separation
+   Issue: Insufficient separation between HGG and LGG probabilities
+   Suggestion: Tune entropy-based sampling parameters, add confidence regularization
+   Expected Effect: Better separation, clearer decision boundary
+
+================================================================================
+VALIDATION REPORTS
+================================================================================
+
+OLD MIL Validation:
+  - Patients: 285
+  - Folds: 5
+  - Validation Passed: True
+
+NEW MIL Validation:
+  - Patients: 285
+  - Folds: 5
+  - Validation Passed: True

@@ -1,0 +1,48 @@
+{
+  "evaluation_set": "Full OOF predictions (285 samples)",
+  "calibration": "Platt scaling (2026-02-07_22-29-29_platt_seed42)",
+  "threshold_0_35": {
+    "threshold": 0.35,
+    "name": "Current (0.35)",
+    "tn": 34,
+    "fp": 41,
+    "fn": 11,
+    "tp": 199,
+    "precision": 0.8291666666666667,
+    "recall": 0.9476190476190476,
+    "f1": 0.8844444444444445,
+    "accuracy": 0.8175438596491228,
+    "specificity": 0.4533333333333333,
+    "lgg_precision": 0.7555555555555555,
+    "lgg_recall": 0.4533333333333333,
+    "lgg_f1": 0.5666666666666667,
+    "hgg_precision": 0.8291666666666667,
+    "hgg_recall": 0.9476190476190476,
+    "hgg_f1": 0.8844444444444445
+  },
+  "threshold_0_36": {
+    "threshold": 0.36,
+    "name": "Candidate (0.36)",
+    "tn": 39,
+    "fp": 36,
+    "fn": 15,
+    "tp": 195,
+    "precision": 0.8441558441558441,
+    "recall": 0.9285714285714286,
+    "f1": 0.8843537414965986,
+    "accuracy": 0.8210526315789474,
+    "specificity": 0.52,
+    "lgg_precision": 0.7222222222222222,
+    "lgg_recall": 0.52,
+    "lgg_f1": 0.6046511627906976,
+    "hgg_precision": 0.8441558441558441,
+    "hgg_recall": 0.9285714285714286,
+    "hgg_f1": 0.8843537414965986
+  },
+  "comparison": {
+    "fn_change": 4,
+    "fp_change": -5,
+    "fn_percentage_change": 36.36363636363637,
+    "fp_percentage_change": -12.195121951219512
+  }
+}

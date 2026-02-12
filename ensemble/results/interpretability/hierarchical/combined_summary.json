@@ -1,0 +1,403 @@
+{
+  "total_patients": 12,
+  "processed": 12,
+  "aligned_count": 0,
+  "summaries": [
+    {
+      "patient_id": "Brats18_TCIA02_168_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 112,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.0,
+        "high_cam_voxels": 892801,
+        "overlap_voxels": 0,
+        "threshold": 0.8050179481506348,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        120,
+        36,
+        32,
+        28,
+        40,
+        116,
+        52,
+        44,
+        24
+      ],
+      "roi_slice_range": {
+        "min": 64,
+        "max": 131
+      },
+      "mil_roi_overlap_ratio": 0.3,
+      "cnn_roi_overlap_ratio": 0.0,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA03_138_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 80,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.023724640943878265,
+        "high_cam_voxels": 892827,
+        "overlap_voxels": 21182,
+        "threshold": 0.6675760746002197,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        120,
+        116,
+        108,
+        112,
+        104,
+        100,
+        96,
+        92,
+        76
+      ],
+      "roi_slice_range": {
+        "min": 30,
+        "max": 97
+      },
+      "mil_roi_overlap_ratio": 0.3,
+      "cnn_roi_overlap_ratio": 0.023724640943878265,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA01_335_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.025645505792275546,
+        "high_cam_voxels": 892827,
+        "overlap_voxels": 22897,
+        "threshold": 0.660195529460907,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32,
+        52
+      ],
+      "roi_slice_range": {
+        "min": 25,
+        "max": 114
+      },
+      "mil_roi_overlap_ratio": 0.3,
+      "cnn_roi_overlap_ratio": 0.025645505792275546,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA10_639_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.03460387827768002,
+        "high_cam_voxels": 892819,
+        "overlap_voxels": 30895,
+        "threshold": 0.7067065238952637,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        20,
+        124,
+        120,
+        116,
+        32
+      ],
+      "roi_slice_range": {
+        "min": 62,
+        "max": 136
+      },
+      "mil_roi_overlap_ratio": 0.3,
+      "cnn_roi_overlap_ratio": 0.03460387827768002,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA10_130_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.024913168485060276,
+        "high_cam_voxels": 892821,
+        "overlap_voxels": 22243,
+        "threshold": 0.5437220931053162,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        0,
+        48,
+        28,
+        120,
+        56,
+        60,
+        52,
+        8,
+        124,
+        20
+      ],
+      "roi_slice_range": {
+        "min": 96,
+        "max": 134
+      },
+      "mil_roi_overlap_ratio": 0.2,
+      "cnn_roi_overlap_ratio": 0.024913168485060276,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA09_451_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.023026407900528786,
+        "high_cam_voxels": 892801,
+        "overlap_voxels": 20558,
+        "threshold": 0.5770298838615417,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        120,
+        0,
+        4,
+        116,
+        112,
+        108,
+        104,
+        8,
+        100
+      ],
+      "roi_slice_range": {
+        "min": 42,
+        "max": 103
+      },
+      "mil_roi_overlap_ratio": 0.1,
+      "cnn_roi_overlap_ratio": 0.023026407900528786,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA13_621_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.03654520772570261,
+        "high_cam_voxels": 892812,
+        "overlap_voxels": 32628,
+        "threshold": 0.7110357284545898,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        104,
+        120,
+        108,
+        112,
+        116,
+        100,
+        96,
+        84,
+        88
+      ],
+      "roi_slice_range": {
+        "min": 32,
+        "max": 75
+      },
+      "mil_roi_overlap_ratio": 0.0,
+      "cnn_roi_overlap_ratio": 0.03654520772570261,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA12_466_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.0709542216014543,
+        "high_cam_voxels": 892801,
+        "overlap_voxels": 63348,
+        "threshold": 0.648612380027771,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        120,
+        116,
+        124,
+        112,
+        108,
+        104,
+        100,
+        96,
+        56,
+        0
+      ],
+      "roi_slice_range": {
+        "min": 86,
+        "max": 142
+      },
+      "mil_roi_overlap_ratio": 0.8,
+      "cnn_roi_overlap_ratio": 0.0709542216014543,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA13_654_1",
+      "true_label": "LGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 112,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.012064278601838483,
+        "high_cam_voxels": 892801,
+        "overlap_voxels": 10771,
+        "threshold": 0.71053546667099,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        0,
+        4,
+        8,
+        124,
+        12,
+        120,
+        116,
+        16,
+        112,
+        108
+      ],
+      "roi_slice_range": {
+        "min": 59,
+        "max": 128
+      },
+      "mil_roi_overlap_ratio": 0.5,
+      "cnn_roi_overlap_ratio": 0.012064278601838483,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA06_332_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.041635258025024616,
+        "high_cam_voxels": 892801,
+        "overlap_voxels": 37172,
+        "threshold": 0.7420094609260559,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        120,
+        36,
+        40,
+        44,
+        48,
+        116,
+        32,
+        56,
+        60
+      ],
+      "roi_slice_range": {
+        "min": 35,
+        "max": 113
+      },
+      "mil_roi_overlap_ratio": 0.6,
+      "cnn_roi_overlap_ratio": 0.041635258025024616,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA01_186_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.04739012681423205,
+        "high_cam_voxels": 892802,
+        "overlap_voxels": 42310,
+        "threshold": 0.5351912379264832,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        124,
+        4,
+        0,
+        120,
+        12,
+        16,
+        8,
+        20,
+        116,
+        112
+      ],
+      "roi_slice_range": {
+        "min": 67,
+        "max": 118
+      },
+      "mil_roi_overlap_ratio": 0.2,
+      "cnn_roi_overlap_ratio": 0.04739012681423205,
+      "aligned": false
+    },
+    {
+      "patient_id": "Brats18_TCIA02_314_1",
+      "true_label": "HGG",
+      "predicted_label": "LGG",
+      "cnn_peak_slice": 48,
+      "cnn_overlap_info": {
+        "cnn_overlap_available": true,
+        "cnn_roi_overlap_ratio": 0.09056319318281097,
+        "high_cam_voxels": 892802,
+        "overlap_voxels": 80855,
+        "threshold": 0.6472306251525879,
+        "threshold_percentile": 90.0
+      },
+      "mil_top_k_slices": [
+        36,
+        52,
+        56,
+        32,
+        60,
+        48,
+        40,
+        28,
+        44,
+        64
+      ],
+      "roi_slice_range": {
+        "min": 26,
+        "max": 114
+      },
+      "mil_roi_overlap_ratio": 1.0,
+      "cnn_roi_overlap_ratio": 0.09056319318281097,
+      "aligned": false
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "cost_configuration": {
+    "w_FN": 2,
+    "w_FP": 1,
+    "description": "Standard medical setting: FN cost = 2x FP cost"
+  },
+  "runs_analyzed": 7,
+  "per_run_results": [
+    {
+      "run_name": "2026-02-07_21-56-45_platt_seed42",
+      "split_seed": 42,
+      "calibration_fraction": 0.7,
+      "optimal_threshold": 0.36000000000000004,
+      "cost": 11,
+      "fn": 1,
+      "fp": 9,
+      "tn": 14,
+      "tp": 62,
+      "precision": 0.8732394366197183,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.9253731343283582,
+      "accuracy": 0.8837209302325582,
+      "specificity": 0.6086956521739131
+    },
+    {
+      "run_name": "2026-02-07_22-29-29_platt_seed42",
+      "split_seed": 42,
+      "calibration_fraction": 0.7,
+      "optimal_threshold": 0.36000000000000004,
+      "cost": 11,
+      "fn": 1,
+      "fp": 9,
+      "tn": 14,
+      "tp": 62,
+      "precision": 0.8732394366197183,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.9253731343283582,
+      "accuracy": 0.8837209302325582,
+      "specificity": 0.6086956521739131
+    },
+    {
+      "run_name": "2026-02-08_01-33-28_platt_seed42",
+      "split_seed": 42,
+      "calibration_fraction": 0.7,
+      "optimal_threshold": 0.36000000000000004,
+      "cost": 11,
+      "fn": 1,
+      "fp": 9,
+      "tn": 14,
+      "tp": 62,
+      "precision": 0.8732394366197183,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.9253731343283582,
+      "accuracy": 0.8837209302325582,
+      "specificity": 0.6086956521739131
+    },
+    {
+      "run_name": "2026-02-08_01-33-52_platt_seed7",
+      "split_seed": 7,
+      "calibration_fraction": 0.7,
+      "optimal_threshold": 0.29000000000000004,
+      "cost": 21,
+      "fn": 3,
+      "fp": 15,
+      "tn": 8,
+      "tp": 60,
+      "precision": 0.8,
+      "recall": 0.9523809523809523,
+      "f1_score": 0.8695652173913043,
+      "accuracy": 0.7906976744186046,
+      "specificity": 0.34782608695652173
+    },
+    {
+      "run_name": "2026-02-08_01-34-39_platt_seed123",
+      "split_seed": 123,
+      "calibration_fraction": 0.7,
+      "optimal_threshold": 0.28,
+      "cost": 19,
+      "fn": 1,
+      "fp": 17,
+      "tn": 6,
+      "tp": 62,
+      "precision": 0.7848101265822784,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.8732394366197183,
+      "accuracy": 0.7906976744186046,
+      "specificity": 0.2608695652173913
+    },
+    {
+      "run_name": "2026-02-08_01-35-45_platt_seed42",
+      "split_seed": 42,
+      "calibration_fraction": 0.65,
+      "optimal_threshold": 0.35000000000000003,
+      "cost": 16,
+      "fn": 3,
+      "fp": 10,
+      "tn": 16,
+      "tp": 71,
+      "precision": 0.8765432098765432,
+      "recall": 0.9594594594594594,
+      "f1_score": 0.9161290322580645,
+      "accuracy": 0.87,
+      "specificity": 0.6153846153846154
+    },
+    {
+      "run_name": "2026-02-08_01-36-05_platt_seed7",
+      "split_seed": 7,
+      "calibration_fraction": 0.65,
+      "optimal_threshold": 0.21000000000000002,
+      "cost": 25,
+      "fn": 0,
+      "fp": 25,
+      "tn": 1,
+      "tp": 74,
+      "precision": 0.7474747474747475,
+      "recall": 1.0,
+      "f1_score": 0.8554913294797688,
+      "accuracy": 0.75,
+      "specificity": 0.038461538461538464
+    }
+  ],
+  "aggregated_statistics": {
+    "median_threshold": 0.35000000000000003,
+    "q25_threshold": 0.28500000000000003,
+    "q75_threshold": 0.36000000000000004,
+    "min_threshold": 0.21000000000000002,
+    "max_threshold": 0.36000000000000004,
+    "iqr": 0.07500000000000001
+  },
+  "evaluation_on_main_run": {
+    "run_name": "2026-02-07_22-29-29_platt_seed42",
+    "comparison": {
+      "median_0_35": {
+        "threshold": 0.35000000000000003,
+        "fn": 1,
+        "fp": 11,
+        "tn": 12,
+        "tp": 62,
+        "precision": 0.8493150684931506,
+        "recall": 0.9841269841269841,
+        "f1_score": 0.9117647058823529,
+        "accuracy": 0.8604651162790697,
+        "cost": 13
+      },
+      "previous_cost_sensitive_0_36": {
+        "threshold": 0.36000000000000004,
+        "fn": 1,
+        "fp": 9,
+        "tn": 14,
+        "tp": 62,
+        "precision": 0.8732394366197183,
+        "recall": 0.9841269841269841,
+        "f1_score": 0.9253731343283582,
+        "accuracy": 0.8837209302325582,
+        "cost": 11
+      },
+      "current_balanced_0_41": {
+        "threshold": 0.4100000000000001,
+        "fn": 4,
+        "fp": 4,
+        "tn": 19,
+        "tp": 59,
+        "precision": 0.9365079365079365,
+        "recall": 0.9365079365079365,
+        "f1_score": 0.9365079365079365,
+        "accuracy": 0.9069767441860465,
+        "cost": 12
+      }
+    }
+  }
+}

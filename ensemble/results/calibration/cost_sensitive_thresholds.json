@@ -1,0 +1,77 @@
+{
+  "evaluation_set": "held-out threshold selection set (30% of OOF, seed=42)",
+  "calibration_run": "2026-02-07_22-29-29_platt_seed42",
+  "cost_configurations": [
+    {
+      "name": "default",
+      "w_FN": 2,
+      "w_FP": 1,
+      "description": "Standard medical setting: FN cost = 2x FP cost"
+    },
+    {
+      "name": "conservative",
+      "w_FN": 3,
+      "w_FP": 1,
+      "description": "Conservative medical setting: FN cost = 3x FP cost"
+    }
+  ],
+  "optimal_thresholds": {
+    "default": {
+      "threshold": 0.36000000000000004,
+      "cost": 11.0,
+      "fn": 1,
+      "fp": 9,
+      "tn": 14,
+      "tp": 62,
+      "precision": 0.8732394366197183,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.9253731343283582,
+      "accuracy": 0.8837209302325582,
+      "specificity": 0.6086956521739131,
+      "comparison_with_balanced_0_41": {
+        "current_cost": 12.0,
+        "optimal_cost": 11.0,
+        "cost_savings": 1.0,
+        "fn_change": -3,
+        "fp_change": 5,
+        "fn_decreased": true,
+        "fp_decreased": false
+      }
+    },
+    "conservative": {
+      "threshold": 0.36000000000000004,
+      "cost": 12.0,
+      "fn": 1,
+      "fp": 9,
+      "tn": 14,
+      "tp": 62,
+      "precision": 0.8732394366197183,
+      "recall": 0.9841269841269841,
+      "f1_score": 0.9253731343283582,
+      "accuracy": 0.8837209302325582,
+      "specificity": 0.6086956521739131,
+      "comparison_with_balanced_0_41": {
+        "current_cost": 16.0,
+        "optimal_cost": 12.0,
+        "cost_savings": 4.0,
+        "fn_change": -3,
+        "fp_change": 5,
+        "fn_decreased": true,
+        "fp_decreased": false
+      }
+    }
+  },
+  "current_balanced_threshold": {
+    "threshold": 0.4100000000000001,
+    "tn": 19,
+    "fp": 4,
+    "fn": 4,
+    "tp": 59,
+    "precision": 0.9365079365079365,
+    "recall": 0.9365079365079365,
+    "f1_score": 0.9365079365079365,
+    "accuracy": 0.9069767441860465,
+    "cost_default": 12,
+    "cost_conservative": 16
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "patient_id": "Brats18_TCIA09_451_1",
+  "variant": "baseline",
+  "class": "LGG",
+  "predicted_class": 0,
+  "predicted_class_name": "LGG",
+  "hgg_prob": 0.4024238884449005,
+  "critical_slice_idx": 6,
+  "bag_size": 32,
+  "overlap_info": {
+    "tumor_overlap_available": true,
+    "top_k": 10,
+    "top_k_indices": [
+      31,
+      30,
+      0,
+      1,
+      29,
+      28,
+      27,
+      26,
+      2,
+      25
+    ],
+    "top_k_slice_indices": [
+      124,
+      120,
+      0,
+      4,
+      116,
+      112,
+      108,
+      104,
+      8,
+      100
+    ],
+    "tumor_slices": [
+      100
+    ],
+    "top_k_tumor_slices": 1,
+    "top_k_overlap_ratio": 0.1
+  },
+  "top_k_indices": [
+    31,
+    30,
+    0,
+    1,
+    29,
+    28,
+    27,
+    26,
+    2,
+    25
+  ],
+  "top_k_overlap_ratio": 0.1,
+  "attention_stats": {
+    "mean": 0.03124999813735485,
+    "std": 0.014918861910700798,
+    "max": 0.08335213363170624,
+    "min": 0.015643414109945297,
+    "entropy": 3.36781644821167
+  }
+}

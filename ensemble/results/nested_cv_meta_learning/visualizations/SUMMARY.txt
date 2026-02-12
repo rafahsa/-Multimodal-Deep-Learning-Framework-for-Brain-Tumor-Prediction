@@ -1,0 +1,65 @@
+================================================================================
+NESTED CV VISUALIZATIONS - COMPLETE
+================================================================================
+
+✓ Step 1: Input Verification
+  - All results loaded from nested_cv_results_*.json
+  - Verified: Metrics computed on outer-test folds only
+  - Verified: 5 outer folds per meta-learner
+  - Verified: No non-nested data detected
+
+✓ Step 2: Visualizations Generated
+  1. fn_fp_tradeoff_nested_cv.png - FN-FP Trade-off (per outer fold)
+  2. cost_distribution_nested_cv.png - Cost Distribution Across Folds
+  3. recall_vs_precision_nested_cv.png - Recall vs Precision (Nested CV)
+  4. per_fold_confusion_summary_nested_cv.png - Per-Fold Confusion Summary
+  5. meta_learner_comparison_nested_cv.png - Meta-Learner Comparison
+
+✓ Step 3: Scientific Safeguards
+  - All plots labeled: "Nested Cross-Validation (Outer-Test Only)"
+  - Footnotes added: "Results reflect true generalization performance..."
+  - No optimistic results used
+  - Publication-ready format
+
+✓ Step 4: Output Location
+  - Directory: ensemble/results/nested_cv_meta_learning/visualizations/
+  - High-resolution (300 DPI)
+  - Clear labels and legends
+
+================================================================================
+FINAL RESULTS (Nested CV - Realistic)
+================================================================================
+
+LogisticRegression:
+  FN: 4.20 ± 2.04 (range: [1, 7])
+  FP: 6.40 ± 2.73
+  Cost: 14.80 ± 2.79
+  Recall: 0.9000 ± 0.0486
+  Precision: 0.8595 ± 0.0479
+
+XGBoost:
+  FN: 5.20 ± 0.98 (range: [4, 7])
+  FP: 8.20 ± 2.79
+  Cost: 18.60 ± 3.01
+  Recall: 0.8762 ± 0.0233
+  Precision: 0.8211 ± 0.0502
+
+================================================================================
+COMPARISON: Previous vs Nested CV
+================================================================================
+
+Previous (Optimistic - NOT VALID):
+  FN: 0
+  FP: 1
+  Cost: 1.0
+  ❌ Data leakage present
+
+Nested CV (Realistic - VALID):
+  FN: 4-5
+  FP: 6-8
+  Cost: 15-19
+  ✅ Truly independent test set
+
+================================================================================
+STATUS: COMPLETE ✓
+================================================================================

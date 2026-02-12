@@ -1,0 +1,38 @@
+{
+  "calibration_mode": "platt",
+  "timestamp": "2026-02-08T01:35:45.995865",
+  "args": {
+    "calibration": "platt",
+    "split_seed": 42,
+    "calibration_fraction": 0.65,
+    "recall_target": 0.94,
+    "sweep_start": 0.05,
+    "sweep_end": 0.95,
+    "sweep_step": 0.01,
+    "n_bins": 10
+  },
+  "thresholds": {
+    "balanced": {
+      "threshold": 0.36000000000000004,
+      "tn": 18,
+      "fp": 8,
+      "fn": 4,
+      "tp": 70,
+      "precision": 0.8974358974358975,
+      "recall": 0.9459459459459459,
+      "f1_score": 0.9210526315789473,
+      "accuracy": 0.88
+    },
+    "high_sensitivity": {
+      "threshold": 0.36000000000000004,
+      "tn": 18,
+      "fp": 8,
+      "fn": 4,
+      "tp": 70,
+      "precision": 0.8974358974358975,
+      "recall": 0.9459459459459459,
+      "f1_score": 0.9210526315789473,
+      "accuracy": 0.88
+    }
+  }
+}

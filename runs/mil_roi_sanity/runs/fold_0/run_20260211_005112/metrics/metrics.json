@@ -1,0 +1,790 @@
+{
+  "accuracy": 0.8947368421052632,
+  "precision": 0.8552631578947368,
+  "recall": 0.9071428571428571,
+  "f1": 0.8742647058823529,
+  "auc": 0.9142857142857143,
+  "confusion_matrix": [
+    [
+      15,
+      0
+    ],
+    [
+      42,
+      0
+    ]
+  ],
+  "classification_report": {
+    "LGG": {
+      "precision": 0.2631578947368421,
+      "recall": 1.0,
+      "f1-score": 0.4166666666666667,
+      "support": 15.0
+    },
+    "HGG": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 42.0
+    },
+    "accuracy": 0.2631578947368421,
+    "macro avg": {
+      "precision": 0.13157894736842105,
+      "recall": 0.5,
+      "f1-score": 0.20833333333333334,
+      "support": 57.0
+    },
+    "weighted avg": {
+      "precision": 0.06925207756232686,
+      "recall": 0.2631578947368421,
+      "f1-score": 0.10964912280701754,
+      "support": 57.0
+    }
+  },
+  "val_probs": [
+    [
+      0.71875,
+      0.281005859375
+    ],
+    [
+      0.72998046875,
+      0.270263671875
+    ],
+    [
+      0.72509765625,
+      0.275146484375
+    ],
+    [
+      0.71728515625,
+      0.282470703125
+    ],
+    [
+      0.71044921875,
+      0.28955078125
+    ],
+    [
+      0.701171875,
+      0.298828125
+    ],
+    [
+      0.72314453125,
+      0.277099609375
+    ],
+    [
+      0.71728515625,
+      0.282470703125
+    ],
+    [
+      0.7109375,
+      0.288818359375
+    ],
+    [
+      0.69873046875,
+      0.301025390625
+    ],
+    [
+      0.673828125,
+      0.326171875
+    ],
+    [
+      0.71240234375,
+      0.28759765625
+    ],
+    [
+      0.7099609375,
+      0.2900390625
+    ],
+    [
+      0.68115234375,
+      0.31884765625
+    ],
+    [
+      0.6884765625,
+      0.3115234375
+    ],
+    [
+      0.71044921875,
+      0.289794921875
+    ],
+    [
+      0.6787109375,
+      0.3212890625
+    ],
+    [
+      0.7021484375,
+      0.298095703125
+    ],
+    [
+      0.7041015625,
+      0.296142578125
+    ],
+    [
+      0.7197265625,
+      0.2802734375
+    ],
+    [
+      0.72412109375,
+      0.27587890625
+    ],
+    [
+      0.7060546875,
+      0.2939453125
+    ],
+    [
+      0.712890625,
+      0.287109375
+    ],
+    [
+      0.71728515625,
+      0.282958984375
+    ],
+    [
+      0.6982421875,
+      0.3017578125
+    ],
+    [
+      0.73291015625,
+      0.26708984375
+    ],
+    [
+      0.6767578125,
+      0.323486328125
+    ],
+    [
+      0.68408203125,
+      0.315673828125
+    ],
+    [
+      0.72412109375,
+      0.275634765625
+    ],
+    [
+      0.71044921875,
+      0.289306640625
+    ],
+    [
+      0.7236328125,
+      0.2763671875
+    ],
+    [
+      0.72705078125,
+      0.273193359375
+    ],
+    [
+      0.7041015625,
+      0.295654296875
+    ],
+    [
+      0.6953125,
+      0.304931640625
+    ],
+    [
+      0.71435546875,
+      0.285400390625
+    ],
+    [
+      0.728515625,
+      0.271728515625
+    ],
+    [
+      0.7236328125,
+      0.276123046875
+    ],
+    [
+      0.72314453125,
+      0.276611328125
+    ],
+    [
+      0.70166015625,
+      0.298095703125
+    ],
+    [
+      0.6376953125,
+      0.362060546875
+    ],
+    [
+      0.712890625,
+      0.286865234375
+    ],
+    [
+      0.70751953125,
+      0.29248046875
+    ],
+    [
+      0.73095703125,
+      0.26904296875
+    ],
+    [
+      0.74365234375,
+      0.25634765625
+    ],
+    [
+      0.68994140625,
+      0.31005859375
+    ],
+    [
+      0.7275390625,
+      0.272216796875
+    ],
+    [
+      0.7353515625,
+      0.2646484375
+    ],
+    [
+      0.72021484375,
+      0.27978515625
+    ],
+    [
+      0.72021484375,
+      0.27978515625
+    ],
+    [
+      0.73388671875,
+      0.266357421875
+    ],
+    [
+      0.72412109375,
+      0.275634765625
+    ],
+    [
+      0.72900390625,
+      0.27099609375
+    ],
+    [
+      0.7333984375,
+      0.266357421875
+    ],
+    [
+      0.72802734375,
+      0.27197265625
+    ],
+    [
+      0.7216796875,
+      0.2783203125
+    ],
+    [
+      0.7294921875,
+      0.270263671875
+    ],
+    [
+      0.72607421875,
+      0.274169921875
+    ]
+  ],
+  "val_labels": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "val_preds": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "training_history": {
+    "train_loss": [
+      0.7926843584629527,
+      0.7874226151851186,
+      0.7699221257577863,
+      0.6792949354439451,
+      0.6053807474019235,
+      0.5915429403907374,
+      0.482378324134308,
+      0.4901335675988281,
+      0.47137498777163656,
+      0.3714459954123748
+    ],
+    "val_loss": [
+      0.7113449335098266,
+      0.7776319603125255,
+      0.49893747866153715,
+      0.669720729192098,
+      0.43521501670281093,
+      0.4258132646481196,
+      0.4344168880954385,
+      0.3495470995704333,
+      0.442455359796683,
+      0.4239358258744081
+    ],
+    "train_acc": [
+      0.47368421052631576,
+      0.5175438596491229,
+      0.5,
+      0.7236842105263158,
+      0.7719298245614035,
+      0.7894736842105263,
+      0.8421052631578947,
+      0.8377192982456141,
+      0.8464912280701754,
+      0.8947368421052632
+    ],
+    "val_acc": [
+      0.2631578947368421,
+      0.2631578947368421,
+      0.8421052631578947,
+      0.5964912280701754,
+      0.8596491228070176,
+      0.8947368421052632,
+      0.8771929824561403,
+      0.8947368421052632,
+      0.8070175438596491,
+      0.8070175438596491
+    ],
+    "val_precision": [
+      0.13157894736842105,
+      0.13157894736842105,
+      0.8255319148936171,
+      0.6706349206349206,
+      0.819047619047619,
+      0.8776223776223776,
+      0.8611111111111112,
+      0.8552631578947368,
+      0.7594594594594595,
+      0.7594594594594595
+    ],
+    "val_recall": [
+      0.5,
+      0.5,
+      0.7428571428571429,
+      0.7047619047619047,
+      0.819047619047619,
+      0.8428571428571427,
+      0.8095238095238095,
+      0.9071428571428571,
+      0.8047619047619048,
+      0.8047619047619048
+    ],
+    "val_f1": [
+      0.20833333333333334,
+      0.20833333333333334,
+      0.7694382022471911,
+      0.5919701213818861,
+      0.819047619047619,
+      0.8579734219269103,
+      0.8301404853128991,
+      0.8742647058823529,
+      0.7732368896925859,
+      0.7732368896925859
+    ],
+    "val_auc": [
+      0.6904761904761905,
+      0.780952380952381,
+      0.8365079365079364,
+      0.846031746031746,
+      0.8777777777777778,
+      0.8825396825396825,
+      0.8936507936507936,
+      0.9142857142857143,
+      0.892063492063492,
+      0.9015873015873016
+    ],
+    "lr": [
+      2e-05,
+      3e-05,
+      4e-05,
+      5e-05,
+      5e-05,
+      4.522542485937369e-05,
+      3.272542485937369e-05,
+      1.7274575140626318e-05,
+      4.7745751406263165e-06,
+      0.0
+    ],
+    "train_mil_stats": [
+      {
+        "attention_entropy_mean": 3.433806896209717,
+        "attention_entropy_std": 0.03317707031965256,
+        "top1_attention_weight_mean": 0.04862403869628906,
+        "top1_attention_weight_std": 0.008991044014692307,
+        "selection_entropy_mean": 3.465725898742676,
+        "selection_entropy_std": 6.781524007237749e-06,
+        "top1_selection_weight_mean": 0.03153299167752266,
+        "top1_selection_weight_std": 9.735539788380265e-05,
+        "effective_attention_instances": 31.010969161987305,
+        "effective_selection_instances": 31.99968147277832
+      },
+      {
+        "attention_entropy_mean": 3.233912944793701,
+        "attention_entropy_std": 0.14855290949344635,
+        "top1_attention_weight_mean": 0.0878860205411911,
+        "top1_attention_weight_std": 0.03796445578336716,
+        "selection_entropy_mean": 3.465654134750366,
+        "selection_entropy_std": 4.12020854128059e-05,
+        "top1_selection_weight_mean": 0.031866561621427536,
+        "top1_selection_weight_std": 0.00016033046995289624,
+        "effective_attention_instances": 25.638004302978516,
+        "effective_selection_instances": 31.997386932373047
+      },
+      {
+        "attention_entropy_mean": 3.2751646041870117,
+        "attention_entropy_std": 0.18447716534137726,
+        "top1_attention_weight_mean": 0.074143186211586,
+        "top1_attention_weight_std": 0.03269896283745766,
+        "selection_entropy_mean": 3.4655001163482666,
+        "selection_entropy_std": 6.766243313904852e-05,
+        "top1_selection_weight_mean": 0.03220542520284653,
+        "top1_selection_weight_std": 0.00017360734636895359,
+        "effective_attention_instances": 26.8641300201416,
+        "effective_selection_instances": 31.992456436157227
+      },
+      {
+        "attention_entropy_mean": 2.7788760662078857,
+        "attention_entropy_std": 0.787747859954834,
+        "top1_attention_weight_mean": 0.1848352998495102,
+        "top1_attention_weight_std": 0.1737535148859024,
+        "selection_entropy_mean": 3.46533465385437,
+        "selection_entropy_std": 0.00010341322922613472,
+        "top1_selection_weight_mean": 0.03250718489289284,
+        "top1_selection_weight_std": 0.00021913355158176273,
+        "effective_attention_instances": 20.314790725708008,
+        "effective_selection_instances": 31.987159729003906
+      },
+      {
+        "attention_entropy_mean": 2.90004563331604,
+        "attention_entropy_std": 0.30720484256744385,
+        "top1_attention_weight_mean": 0.1134604662656784,
+        "top1_attention_weight_std": 0.04125083610415459,
+        "selection_entropy_mean": 3.4649112224578857,
+        "selection_entropy_std": 0.00020827577100135386,
+        "top1_selection_weight_mean": 0.03289315477013588,
+        "top1_selection_weight_std": 0.00029419513884931803,
+        "effective_attention_instances": 19.01881980895996,
+        "effective_selection_instances": 31.973628997802734
+      },
+      {
+        "attention_entropy_mean": 2.7992279529571533,
+        "attention_entropy_std": 0.23172296583652496,
+        "top1_attention_weight_mean": 0.1145511120557785,
+        "top1_attention_weight_std": 0.03150135278701782,
+        "selection_entropy_mean": 3.4637203216552734,
+        "selection_entropy_std": 0.0003838349075522274,
+        "top1_selection_weight_mean": 0.03360609710216522,
+        "top1_selection_weight_std": 0.0004024548688903451,
+        "effective_attention_instances": 16.864171981811523,
+        "effective_selection_instances": 31.935564041137695
+      },
+      {
+        "attention_entropy_mean": 2.7041594982147217,
+        "attention_entropy_std": 0.30387163162231445,
+        "top1_attention_weight_mean": 0.14013469219207764,
+        "top1_attention_weight_std": 0.05277668684720993,
+        "selection_entropy_mean": 3.4613068103790283,
+        "selection_entropy_std": 0.0008921945700421929,
+        "top1_selection_weight_mean": 0.03480814769864082,
+        "top1_selection_weight_std": 0.0006052306271158159,
+        "effective_attention_instances": 15.617634773254395,
+        "effective_selection_instances": 31.858591079711914
+      },
+      {
+        "attention_entropy_mean": 2.7203986644744873,
+        "attention_entropy_std": 0.3105548620223999,
+        "top1_attention_weight_mean": 0.13052816689014435,
+        "top1_attention_weight_std": 0.04218686372041702,
+        "selection_entropy_mean": 3.4543843269348145,
+        "selection_entropy_std": 0.002098019467666745,
+        "top1_selection_weight_mean": 0.03693387284874916,
+        "top1_selection_weight_std": 0.0010040744673460722,
+        "effective_attention_instances": 15.914175987243652,
+        "effective_selection_instances": 31.638866424560547
+      },
+      {
+        "attention_entropy_mean": 2.843825578689575,
+        "attention_entropy_std": 0.2015342116355896,
+        "top1_attention_weight_mean": 0.11393266171216965,
+        "top1_attention_weight_std": 0.03227382153272629,
+        "selection_entropy_mean": 3.4355897903442383,
+        "selection_entropy_std": 0.005869005806744099,
+        "top1_selection_weight_mean": 0.04014959558844566,
+        "top1_selection_weight_std": 0.0015516167040914297,
+        "effective_attention_instances": 17.525243759155273,
+        "effective_selection_instances": 31.050256729125977
+      },
+      {
+        "attention_entropy_mean": 2.7123587131500244,
+        "attention_entropy_std": 0.2963845431804657,
+        "top1_attention_weight_mean": 0.1379973441362381,
+        "top1_attention_weight_std": 0.0508171021938324,
+        "selection_entropy_mean": 3.4182159900665283,
+        "selection_entropy_std": 0.01007948350161314,
+        "top1_selection_weight_mean": 0.0428265780210495,
+        "top1_selection_weight_std": 0.0022833633702248335,
+        "effective_attention_instances": 15.712442398071289,
+        "effective_selection_instances": 30.516477584838867
+      }
+    ],
+    "val_mil_stats": [
+      {
+        "attention_entropy_mean": 3.2771472930908203,
+        "attention_entropy_std": 0.06337985396385193,
+        "top1_attention_weight_mean": 0.0783301293849945,
+        "top1_attention_weight_std": 0.015628674998879433,
+        "selection_entropy_mean": 3.463160276412964,
+        "selection_entropy_std": 0.0008328915573656559,
+        "top1_selection_weight_mean": 0.0351167656481266,
+        "top1_selection_weight_std": 0.0010704603046178818,
+        "effective_attention_instances": 26.55269432067871,
+        "effective_selection_instances": 31.917695999145508
+      },
+      {
+        "attention_entropy_mean": 3.3754210472106934,
+        "attention_entropy_std": 0.05745536834001541,
+        "top1_attention_weight_mean": 0.05445019155740738,
+        "top1_attention_weight_std": 0.006828845012933016,
+        "selection_entropy_mean": 3.451695680618286,
+        "selection_entropy_std": 0.0036872229538857937,
+        "top1_selection_weight_mean": 0.03876805305480957,
+        "top1_selection_weight_std": 0.0016267054015770555,
+        "effective_attention_instances": 29.283977508544922,
+        "effective_selection_instances": 31.55406379699707
+      },
+      {
+        "attention_entropy_mean": 2.8594703674316406,
+        "attention_entropy_std": 0.34061524271965027,
+        "top1_attention_weight_mean": 0.14235804975032806,
+        "top1_attention_weight_std": 0.05620906874537468,
+        "selection_entropy_mean": 3.4405357837677,
+        "selection_entropy_std": 0.006521504372358322,
+        "top1_selection_weight_mean": 0.040902577340602875,
+        "top1_selection_weight_std": 0.0019100827630609274,
+        "effective_attention_instances": 18.44394874572754,
+        "effective_selection_instances": 31.204326629638672
+      },
+      {
+        "attention_entropy_mean": 2.891780376434326,
+        "attention_entropy_std": 0.3293750584125519,
+        "top1_attention_weight_mean": 0.12901566922664642,
+        "top1_attention_weight_std": 0.048463597893714905,
+        "selection_entropy_mean": 3.4380218982696533,
+        "selection_entropy_std": 0.00807213969528675,
+        "top1_selection_weight_mean": 0.042003486305475235,
+        "top1_selection_weight_std": 0.002165060956031084,
+        "effective_attention_instances": 19.00315284729004,
+        "effective_selection_instances": 31.126338958740234
+      },
+      {
+        "attention_entropy_mean": 2.6080896854400635,
+        "attention_entropy_std": 0.21179676055908203,
+        "top1_attention_weight_mean": 0.13637790083885193,
+        "top1_attention_weight_std": 0.026568077504634857,
+        "selection_entropy_mean": 3.424865961074829,
+        "selection_entropy_std": 0.009237965568900108,
+        "top1_selection_weight_mean": 0.04253307729959488,
+        "top1_selection_weight_std": 0.0018300226656720042,
+        "effective_attention_instances": 13.888277053833008,
+        "effective_selection_instances": 30.71984100341797
+      },
+      {
+        "attention_entropy_mean": 2.5291080474853516,
+        "attention_entropy_std": 0.25928694009780884,
+        "top1_attention_weight_mean": 0.15687277913093567,
+        "top1_attention_weight_std": 0.03881164640188217,
+        "selection_entropy_mean": 3.4205820560455322,
+        "selection_entropy_std": 0.010331503115594387,
+        "top1_selection_weight_mean": 0.04419412463903427,
+        "top1_selection_weight_std": 0.0019996375776827335,
+        "effective_attention_instances": 12.992456436157227,
+        "effective_selection_instances": 30.588830947875977
+      },
+      {
+        "attention_entropy_mean": 2.4607126712799072,
+        "attention_entropy_std": 0.2896904945373535,
+        "top1_attention_weight_mean": 0.1752498745918274,
+        "top1_attention_weight_std": 0.06874329596757889,
+        "selection_entropy_mean": 3.4177980422973633,
+        "selection_entropy_std": 0.009928520768880844,
+        "top1_selection_weight_mean": 0.04343252256512642,
+        "top1_selection_weight_std": 0.0017903000116348267,
+        "effective_attention_instances": 12.229164123535156,
+        "effective_selection_instances": 30.503677368164062
+      },
+      {
+        "attention_entropy_mean": 2.717589855194092,
+        "attention_entropy_std": 0.2235943228006363,
+        "top1_attention_weight_mean": 0.13167805969715118,
+        "top1_attention_weight_std": 0.05185452103614807,
+        "selection_entropy_mean": 3.415410280227661,
+        "selection_entropy_std": 0.010230614803731441,
+        "top1_selection_weight_mean": 0.04335835576057434,
+        "top1_selection_weight_std": 0.0018971634563058615,
+        "effective_attention_instances": 15.516087532043457,
+        "effective_selection_instances": 30.431026458740234
+      },
+      {
+        "attention_entropy_mean": 2.5849857330322266,
+        "attention_entropy_std": 0.2833729684352875,
+        "top1_attention_weight_mean": 0.16723988950252533,
+        "top1_attention_weight_std": 0.07972998172044754,
+        "selection_entropy_mean": 3.4134559631347656,
+        "selection_entropy_std": 0.009653848595917225,
+        "top1_selection_weight_mean": 0.04351304844021797,
+        "top1_selection_weight_std": 0.0019084824016317725,
+        "effective_attention_instances": 13.781953811645508,
+        "effective_selection_instances": 30.37142562866211
+      },
+      {
+        "attention_entropy_mean": 2.5427846908569336,
+        "attention_entropy_std": 0.28762364387512207,
+        "top1_attention_weight_mean": 0.16829527914524078,
+        "top1_attention_weight_std": 0.06972501426935196,
+        "selection_entropy_mean": 3.413428783416748,
+        "selection_entropy_std": 0.010302182286977768,
+        "top1_selection_weight_mean": 0.04429708793759346,
+        "top1_selection_weight_std": 0.001975367544218898,
+        "effective_attention_instances": 13.256794929504395,
+        "effective_selection_instances": 30.370807647705078
+      }
+    ]
+  },
+  "final_mil_diagnostics": {
+    "attention_entropy_mean": 3.4303810596466064,
+    "attention_entropy_std": 0.02302001416683197,
+    "top1_attention_weight_mean": 0.04640886187553406,
+    "top1_attention_weight_std": 0.009432770311832428,
+    "selection_entropy_mean": 3.4618265628814697,
+    "selection_entropy_std": 0.0017193793319165707,
+    "top1_selection_weight_mean": 0.036075036972761154,
+    "top1_selection_weight_std": 0.0019796632695943117,
+    "effective_attention_instances": 30.896408081054688,
+    "effective_selection_instances": 31.875186920166016
+  },
+  "loss_summary": {
+    "train_loss": {
+      "final": 0.3714459954123748,
+      "min": 0.3714459954123748,
+      "max": 0.7926843584629527,
+      "mean": 0.6041580597559613,
+      "std": 0.14213729713362064
+    },
+    "val_loss": {
+      "final": 0.4239358258744081,
+      "min": 0.3495470995704333,
+      "max": 0.7776319603125255,
+      "mean": 0.516901855636388,
+      "std": 0.13907941749809272,
+      "best_epoch": 8,
+      "best_value": 0.3495470995704333
+    }
+  },
+  "loss_info": {
+    "loss_type": "CrossEntropyLoss",
+    "class_balancing": "WeightedRandomSampler (data-level)",
+    "note": "CrossEntropyLoss chosen for MIL stability and compatibility with dual-stream aggregation"
+  },
+  "checkpoint_info": {
+    "checkpoint_path": "runs/mil_roi_sanity/runs/fold_0/run_20260211_005112/checkpoints/best_ema.pt",
+    "checkpoint_name": "best_ema.pt",
+    "checkpoint_epoch": 8,
+    "checkpoint_val_auc": 0.9142857142857143,
+    "is_ema": true,
+    "best_epoch": 8,
+    "best_val_auc": 0.9142857142857143
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "sklearn_method_failed": "The 'cv' parameter of CalibratedClassifierCV must be an int in the range [2, inf), an object implementing 'split' and 'get_n_splits', an iterable or None. Got 'prefit' instead.",
+  "note": "Using clean implementation only"
+}

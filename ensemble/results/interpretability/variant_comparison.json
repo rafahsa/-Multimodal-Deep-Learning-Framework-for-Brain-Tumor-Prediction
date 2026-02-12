@@ -1,0 +1,26 @@
+{
+  "baseline": {
+    "avg_mil_overlap": 0.3833333333333333,
+    "avg_cnn_overlap": 0.03592215727920716,
+    "aligned_count": 0,
+    "total_patients": 12,
+    "aligned_percentage": 0.0
+  },
+  "roi": {
+    "avg_mil_overlap": 0.48333333333333334,
+    "avg_cnn_overlap": 0.03592215727920716,
+    "aligned_count": 0,
+    "total_patients": 12,
+    "aligned_percentage": 0.0
+  },
+  "differences": {
+    "mil_diff": 0.10000000000000003,
+    "cnn_diff": 0.0,
+    "aligned_diff": 0
+  },
+  "interpretation": {
+    "roi_mil_better": true,
+    "roi_aligned_better": false,
+    "conclusion": "ROI variant shows stronger interpretability alignment"
+  }
+}

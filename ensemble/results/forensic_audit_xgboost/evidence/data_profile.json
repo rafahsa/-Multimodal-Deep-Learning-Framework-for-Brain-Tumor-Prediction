@@ -1,0 +1,53 @@
+{
+  "n_rows": 285,
+  "n_features": 3,
+  "class_distribution": {
+    "1": 210,
+    "0": 75
+  },
+  "feature_stats": {
+    "hgg_prob_resnet": {
+      "min": 0.16521406,
+      "max": 0.99989307,
+      "mean": 0.8883786005263158,
+      "std": 0.11948225680537108
+    },
+    "hgg_prob_swin": {
+      "min": 0.0023331007,
+      "max": 0.99999225,
+      "mean": 0.5798635070684212,
+      "std": 0.44056338990687754
+    },
+    "hgg_prob_mil": {
+      "min": 0.1113,
+      "max": 0.9497,
+      "mean": 0.484701052631579,
+      "std": 0.15300543658853638
+    }
+  },
+  "has_nan": {
+    "hgg_prob_resnet": 0,
+    "hgg_prob_swin": 0,
+    "hgg_prob_mil": 0
+  },
+  "has_inf": {
+    "hgg_prob_resnet": 0,
+    "hgg_prob_swin": 0,
+    "hgg_prob_mil": 0
+  },
+  "duplicate_rows": 0,
+  "duplicate_features": 0,
+  "patient_id_duplicates": 0,
+  "fold_distribution": {
+    "3": 57,
+    "0": 57,
+    "4": 57,
+    "2": 57,
+    "1": 57
+  },
+  "samples_per_fold": {
+    "min": 57,
+    "max": 57,
+    "mean": 57.0
+  }
+}

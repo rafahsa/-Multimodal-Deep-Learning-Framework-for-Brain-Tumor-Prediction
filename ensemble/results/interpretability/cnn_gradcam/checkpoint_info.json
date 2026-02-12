@@ -1,0 +1,8 @@
+{
+  "checkpoint_path": "/workspace/brain_tumor_project/results/ResNet50-3D/runs/fold_0/run_20260107_060952/checkpoints/best_ema.pt",
+  "fold": 0,
+  "target_class": "pred",
+  "num_patients": 12,
+  "model_name": "ResNet50-3D",
+  "input_shape": "(1, 4, 128, 128, 128)"
+}

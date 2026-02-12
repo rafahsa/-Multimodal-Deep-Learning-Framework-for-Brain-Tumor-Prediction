@@ -1,0 +1,339 @@
+{
+  "strengths": {
+    "overall_accuracy": 0.8070175438596491,
+    "hgg_accuracy": 0.7476190476190476,
+    "lgg_accuracy": 0.9733333333333334,
+    "high_conf_correct_pct": 0.7368421052631579,
+    "high_conf_correct_hgg": 145,
+    "high_conf_correct_lgg": 65,
+    "mean_prob_correct_hgg": 0.9586244994904459,
+    "mean_prob_correct_lgg": 0.07449830234246575,
+    "std_prob_correct_hgg": 0.09628481368289614,
+    "std_prob_correct_lgg": 0.11061426306595026
+  },
+  "errors": {
+    "fn_count": "53",
+    "fp_count": "2",
+    "fn_patients": [
+      "Brats18_2013_10_1",
+      "Brats18_2013_11_1",
+      "Brats18_2013_12_1",
+      "Brats18_2013_13_1",
+      "Brats18_2013_14_1",
+      "Brats18_2013_19_1",
+      "Brats18_2013_21_1",
+      "Brats18_2013_23_1",
+      "Brats18_2013_25_1",
+      "Brats18_2013_26_1",
+      "Brats18_2013_2_1",
+      "Brats18_2013_5_1",
+      "Brats18_2013_7_1",
+      "Brats18_CBICA_AQN_1",
+      "Brats18_CBICA_AZD_1",
+      "Brats18_TCIA01_131_1",
+      "Brats18_TCIA01_180_1",
+      "Brats18_TCIA01_186_1",
+      "Brats18_TCIA01_190_1",
+      "Brats18_TCIA01_221_1",
+      "Brats18_TCIA01_390_1",
+      "Brats18_TCIA02_117_1",
+      "Brats18_TCIA02_179_1",
+      "Brats18_TCIA02_198_1",
+      "Brats18_TCIA02_208_1",
+      "Brats18_TCIA02_283_1",
+      "Brats18_TCIA02_290_1",
+      "Brats18_TCIA02_309_1",
+      "Brats18_TCIA02_314_1",
+      "Brats18_TCIA02_331_1",
+      "Brats18_TCIA02_394_1",
+      "Brats18_TCIA02_473_1",
+      "Brats18_TCIA02_606_1",
+      "Brats18_TCIA02_608_1",
+      "Brats18_TCIA03_133_1",
+      "Brats18_TCIA03_498_1",
+      "Brats18_TCIA04_111_1",
+      "Brats18_TCIA04_149_1",
+      "Brats18_TCIA04_343_1",
+      "Brats18_TCIA04_437_1",
+      "Brats18_TCIA05_277_1",
+      "Brats18_TCIA05_396_1",
+      "Brats18_TCIA05_444_1",
+      "Brats18_TCIA06_165_1",
+      "Brats18_TCIA06_332_1",
+      "Brats18_TCIA06_409_1",
+      "Brats18_TCIA06_603_1",
+      "Brats18_TCIA08_234_1",
+      "Brats18_TCIA08_278_1",
+      "Brats18_TCIA08_280_1",
+      "Brats18_TCIA08_406_1",
+      "Brats18_TCIA08_436_1",
+      "Brats18_TCIA08_469_1"
+    ],
+    "fp_patients": [
+      "Brats18_TCIA09_312_1",
+      "Brats18_TCIA10_625_1"
+    ],
+    "fn_mean_prob": 0.13864779383962264,
+    "fp_mean_prob": 0.9851719750000001,
+    "fn_std_prob": 0.13746291660644683,
+    "fp_std_prob": 0.020205540917066528,
+    "fn_fold_distribution": {
+      "4": 18,
+      "0": 10,
+      "2": 9,
+      "3": 9,
+      "1": 7
+    },
+    "fp_fold_distribution": {
+      "0": 1,
+      "2": 1
+    },
+    "fn_vs_tp_prob_diff": 0.8199767056508233,
+    "fn_vs_tp_prob_ttest": 4.402136424133107e-114,
+    "fp_vs_tn_prob_diff": 0.9106736726575343,
+    "fp_vs_tn_prob_ttest": 3.634072961319343e-18
+  },
+  "consistency": {
+    "fold_errors": {
+      "0": {
+        "fn": "10",
+        "fp": "1",
+        "fn_rate": 0.23809523809523808,
+        "fp_rate": 0.06666666666666667
+      },
+      "1": {
+        "fn": "7",
+        "fp": "0",
+        "fn_rate": 0.16666666666666666,
+        "fp_rate": 0.0
+      },
+      "2": {
+        "fn": "9",
+        "fp": "1",
+        "fn_rate": 0.21428571428571427,
+        "fp_rate": 0.06666666666666667
+      },
+      "3": {
+        "fn": "9",
+        "fp": "0",
+        "fn_rate": 0.21428571428571427,
+        "fp_rate": 0.0
+      },
+      "4": {
+        "fn": "18",
+        "fp": "0",
+        "fn_rate": 0.42857142857142855,
+        "fp_rate": 0.0
+      }
+    },
+    "fn_std_across_folds": 3.8262252939417984,
+    "fp_std_across_folds": 0.48989794855663565
+  },
+  "confidence": {
+    "correct_mean_prob": 0.6780105325695651,
+    "correct_std_prob": 0.4236416016031699,
+    "incorrect_mean_prob": 0.16943049133636362,
+    "incorrect_std_prob": 0.20732463897161263,
+    "ece": 0.24710074619473685,
+    "calibration_bins": {
+      "bin_centers": [
+        0.05,
+        0.15000000000000002,
+        0.25,
+        0.35000000000000003,
+        0.45,
+        0.55,
+        0.6500000000000001,
+        0.75,
+        0.8500000000000001,
+        0.95
+      ],
+      "accuracies": [
+        0.6666666666666666,
+        0.4117647058823529,
+        0.125,
+        0.625,
+        0.3333333333333333,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9852941176470589
+      ],
+      "mean_probs": [
+        0.0308444851091954,
+        0.15514415882352942,
+        0.24207724125000002,
+        0.34573039125,
+        0.46055453,
+        0.5712833500000001,
+        0.6525075233333334,
+        0.756648692,
+        0.8460027236363635,
+        0.9936945660294119
+      ],
+      "counts": [
+        87,
+        17,
+        8,
+        8,
+        6,
+        4,
+        3,
+        5,
+        11,
+        136
+      ]
+    }
+  },
+  "redundancy": {
+    "swin_resnet_correlation": 0.2535187743191995,
+    "swin_mil_correlation": 0.14700403405541432,
+    "resnet_mil_correlation": 0.06962319767192507,
+    "swin_resnet_agreement": 0.5859649122807018,
+    "swin_mil_agreement": 0.5578947368421052,
+    "resnet_mil_agreement": 0.9719298245614035,
+    "swin_unique_correct_count": 66,
+    "resnet_unique_correct_count": 0,
+    "mil_unique_correct_count": 1,
+    "swin_unique_correct_patients": [
+      "Brats18_2013_0_1",
+      "Brats18_2013_15_1",
+      "Brats18_2013_16_1",
+      "Brats18_2013_1_1",
+      "Brats18_2013_24_1",
+      "Brats18_2013_28_1",
+      "Brats18_2013_29_1",
+      "Brats18_2013_6_1",
+      "Brats18_2013_8_1",
+      "Brats18_2013_9_1",
+      "Brats18_TCIA09_141_1",
+      "Brats18_TCIA09_177_1",
+      "Brats18_TCIA09_254_1",
+      "Brats18_TCIA09_255_1",
+      "Brats18_TCIA09_402_1",
+      "Brats18_TCIA09_428_1",
+      "Brats18_TCIA09_462_1",
+      "Brats18_TCIA09_493_1",
+      "Brats18_TCIA09_620_1",
+      "Brats18_TCIA10_109_1",
+      "Brats18_TCIA10_152_1",
+      "Brats18_TCIA10_175_1",
+      "Brats18_TCIA10_202_1",
+      "Brats18_TCIA10_241_1",
+      "Brats18_TCIA10_261_1",
+      "Brats18_TCIA10_266_1",
+      "Brats18_TCIA10_276_1",
+      "Brats18_TCIA10_282_1",
+      "Brats18_TCIA10_299_1",
+      "Brats18_TCIA10_307_1",
+      "Brats18_TCIA10_310_1",
+      "Brats18_TCIA10_325_1",
+      "Brats18_TCIA10_330_1",
+      "Brats18_TCIA10_346_1",
+      "Brats18_TCIA10_351_1",
+      "Brats18_TCIA10_387_1",
+      "Brats18_TCIA10_393_1",
+      "Brats18_TCIA10_408_1",
+      "Brats18_TCIA10_410_1",
+      "Brats18_TCIA10_413_1",
+      "Brats18_TCIA10_420_1",
+      "Brats18_TCIA10_442_1",
+      "Brats18_TCIA10_449_1",
+      "Brats18_TCIA10_628_1",
+      "Brats18_TCIA10_629_1",
+      "Brats18_TCIA10_632_1",
+      "Brats18_TCIA10_640_1",
+      "Brats18_TCIA10_644_1",
+      "Brats18_TCIA12_101_1",
+      "Brats18_TCIA12_249_1",
+      "Brats18_TCIA12_298_1",
+      "Brats18_TCIA12_466_1",
+      "Brats18_TCIA12_470_1",
+      "Brats18_TCIA12_480_1",
+      "Brats18_TCIA13_615_1",
+      "Brats18_TCIA13_618_1",
+      "Brats18_TCIA13_621_1",
+      "Brats18_TCIA13_623_1",
+      "Brats18_TCIA13_624_1",
+      "Brats18_TCIA13_630_1",
+      "Brats18_TCIA13_633_1",
+      "Brats18_TCIA13_634_1",
+      "Brats18_TCIA13_645_1",
+      "Brats18_TCIA13_650_1",
+      "Brats18_TCIA13_653_1",
+      "Brats18_TCIA13_654_1"
+    ]
+  },
+  "design": {
+    "rationale": {
+      "primary_goal": "Reduce FN by capturing small/diffuse tumors that current Swin misses",
+      "secondary_goal": "Reduce FP by better distinguishing LGG from HGG",
+      "key_insight": "Current Swin has 53 FN with mean prob 0.1386, suggesting it misses subtle HGG cases"
+    },
+    "architectural_changes": {
+      "input_view": "Keep axial (current), but consider multi-view ensemble later",
+      "patch_size": "Smaller patch size (1 instead of 2) to capture fine details",
+      "window_size": "Smaller window (4 instead of 7) for local attention",
+      "resolution": "Higher resolution input (160x160x160 instead of 128x128x128)",
+      "cropping": "Tumor-focused cropping (if segmentation available) OR full brain with attention",
+      "feature_size": "Larger feature size (64 instead of 48) for more capacity",
+      "depths": "Deeper network ([3, 3, 3, 3] instead of [2, 2, 2, 2]) for more representation"
+    },
+    "training_strategy": {
+      "loss_function": "Focal Loss (gamma=2.0, alpha=0.25) to focus on hard examples",
+      "sampling": "Hard example mining - oversample FN cases from current Swin",
+      "class_weights": "Higher weight for HGG class (pos_weight=2.0-3.0)",
+      "augmentation": "Stronger augmentation for small tumors (zoom, rotation)",
+      "regularization": "Moderate dropout (0.3) to prevent overfitting"
+    },
+    "expected_impact": {
+      "fn_reduction": "Target: Reduce FN from 53 to <10 (60% reduction)",
+      "fp_reduction": "Target: Reduce FP from 2 to <10",
+      "complementarity": "Should capture different signal than Swin-1 (small tumors, diffuse patterns)",
+      "ensemble_interaction": "Should have lower correlation with Swin-1 (<0.7) while maintaining high AUC (>0.85)"
+    },
+    "risks": [
+      "Overfitting: 285 samples may not support deeper/larger model",
+      "Redundancy: Second Swin may learn similar patterns to first",
+      "Computational cost: Higher resolution and deeper network = slower training",
+      "Data requirements: May need more data augmentation or synthetic data"
+    ]
+  },
+  "feasibility": {
+    "current_metrics": {
+      "fn": "53",
+      "fp": "2",
+      "precision": 0.9874213836477987,
+      "recall": 0.7476190476190476,
+      "auc": 0.9065396825396825
+    },
+    "target_metrics": {
+      "fn": 5,
+      "fp": 5,
+      "precision": 0.95,
+      "recall": 0.95
+    },
+    "theoretical_limits": {
+      "min_fn_recall": 0.9761904761904762,
+      "min_fp_precision": 0.9767441860465116,
+      "achievable_with_fn_5": "True",
+      "achievable_with_fp_5": "True"
+    },
+    "realistic_assessment": {
+      "theoretically_possible": true,
+      "practical_likelihood": "MODERATE",
+      "reason": "Theoretical limits allow targets, but requires near-perfect model"
+    },
+    "go_no_go": "NO_GO",
+    "go_no_go_reason": "Too large improvement needed, unlikely to succeed"
+  },
+  "summary": {
+    "current_fn": "53",
+    "current_fp": "2",
+    "target_fn": 5,
+    "target_fp": 5,
+    "go_no_go": "NO_GO",
+    "go_no_go_reason": "Too large improvement needed, unlikely to succeed"
+  }
+}

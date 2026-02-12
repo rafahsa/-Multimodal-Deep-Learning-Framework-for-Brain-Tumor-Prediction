@@ -1,0 +1,8 @@
+Method,Configuration,Precision,Recall,F1,FN,FP
+Simple Threshold,threshold=0.50,0.9874,0.7476,0.8509,53,2
+Simple Threshold,threshold=0.45,0.9755,0.7571,0.8525,51,4
+Simple Threshold,threshold=0.40,0.9758,0.7667,0.8587,49,4
+Simple Threshold,threshold=0.35,0.9643,0.7714,0.8571,48,6
+Reject Zone,[0.40 - 0.60],0.9758,0.7667,0.8587,49,4
+Reject Zone,[0.35 - 0.65],0.9643,0.7714,0.8571,48,6
+Reject Zone,[0.45 - 0.65],0.9755,0.7571,0.8525,51,4
