@@ -1,0 +1,8 @@
+16G	results/DualStreamMIL-3D
+2.1G	results/DualStreamMIL-3D_phase1_experiment1_entropy
+2.0K	results/MIL
+20G	results/ResNet50-3D
+6.5G	results/SwinUNETR-3D
+737M	results/SwinUNETR-3D-Swin2
+3.2M	results/Swin_UNETR
+1.5M	results/entropy_visualization
