@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroGrade — Multimodal Brain Tumor Classification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0a0c10;
+            --chalk: #f4f1ec;
+            --accent: #c44b3f;
+            --accent-glow: #e85d50;
+            --teal: #2a8a7a;
+            --teal-dim: #1d6b5e;
+            --surface: #12151c;
+            --surface-raised: #1a1e28;
+            --surface-glass: rgba(26, 30, 40, 0.7);
+            --border: rgba(244, 241, 236, 0.08);
+            --text-muted: rgba(244, 241, 236, 0.55);
+            --text-secondary: rgba(244, 241, 236, 0.75);
+            --gradient-mesh: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(42, 138, 122, 0.12) 0%, transparent 60%),
+                             radial-gradient(ellipse 50% 80% at 80% 90%, rgba(196, 75, 63, 0.08) 0%, transparent 50%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            color: var(--chalk);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ============ NAV ============ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.25rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px) saturate(1.2);
+            background: rgba(10, 12, 16, 0.75);
+            border-bottom: 1px solid var(--border);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-logo {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--chalk);
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            color: var(--teal);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--chalk);
+        }
+
+        .nav-cta {
+            padding: 0.6rem 1.4rem;
+            background: var(--teal);
+            color: var(--chalk);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: var(--teal-dim);
+            transform: translateY(-1px);
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 3rem 4rem;
+            position: relative;
+            background: var(--gradient-mesh);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(42, 138, 122, 0.06) 0%, transparent 70%);
+            animation: pulse-slow 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.7; }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            width: fit-content;
+            animation: fade-up 0.8s ease-out both;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--teal);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3.2rem, 7.5vw, 6.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            max-width: 900px;
+            animation: fade-up 0.8s ease-out 0.15s both;
+        }
+
+        .hero-title .highlight {
+            color: var(--teal);
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            margin-top: 1.5rem;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            line-height: 1.7;
+            animation: fade-up 0.8s ease-out 0.3s both;
+        }
+
+        .hero-actions {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            animation: fade-up 0.8s ease-out 0.45s both;
+        }
+
+        .btn-primary {
+            padding: 0.85rem 2rem;
+            background: var(--teal);
+            color: var(--chalk);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--teal-dim);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(42, 138, 122, 0.2);
+        }
+
+        .btn-secondary {
+            padding: 0.85rem 2rem;
+            background: transparent;
+            color: var(--chalk);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-muted);
+            background: var(--surface-raised);
+        }
+
+        .hero-stats {
+            margin-top: 5rem;
+            display: flex;
+            gap: 4rem;
+            animation: fade-up 0.8s ease-out 0.6s both;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.5rem;
+            color: var(--chalk);
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ SECTION COMMON ============ */
+        section {
+            padding: 7rem 3rem;
+            position: relative;
+        }
+
+        .section-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--teal);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            letter-spacing: -0.02em;
+            max-width: 650px;
+            line-height: 1.15;
+        }
+
+        .section-desc {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            max-width: 550px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* ============ PIPELINE ============ */
+        .pipeline {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1px;
+            margin-top: 4rem;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .pipeline-card {
+            background: var(--surface);
+            padding: 2.5rem 2rem;
+            position: relative;
+            transition: background 0.4s;
+        }
+
+        .pipeline-card:hover {
+            background: var(--surface-raised);
+        }
+
+        .pipeline-card-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            color: rgba(42, 138, 122, 0.15);
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+        }
+
+        .pipeline-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(42, 138, 122, 0.1);
+            border: 1px solid rgba(42, 138, 122, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .pipeline-card h3 {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 0.6rem;
+        }
+
+        .pipeline-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ============ ARCHITECTURE ============ */
+        .architecture {
+            background: var(--gradient-mesh);
+        }
+
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .arch-card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top left, rgba(42, 138, 122, 0.04) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(42, 138, 122, 0.3);
+        }
+
+        .arch-card:hover::before {
+            opacity: 1;
+        }
+
+        .arch-card-tag {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            background: rgba(42, 138, 122, 0.1);
+            border: 1px solid rgba(42, 138, 122, 0.2);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--teal);
+            margin-bottom: 1.5rem;
+        }
+
+        .arch-card h3 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.6rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .arch-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .arch-card-metric {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .arch-card-metric .value {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--teal);
+        }
+
+        .arch-card-metric .label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============ RESULTS ============ */
+        .results {
+            border-top: 1px solid var(--border);
+        }
+
+        .results-showcase {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .result-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: border-color 0.3s;
+        }
+
+        .result-block:hover {
+            border-color: rgba(42, 138, 122, 0.25);
+        }
+
+        .result-block h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric .number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.8rem;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .metric .desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .result-block.highlight-block {
+            background: linear-gradient(135deg, rgba(42, 138, 122, 0.08) 0%, var(--surface) 60%);
+            border-color: rgba(42, 138, 122, 0.2);
+        }
+
+        .result-block.highlight-block .number {
+            color: var(--teal);
+        }
+
+        /* ============ FEATURES ============ */
+        .features {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .features-list {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .feature-item {
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+
+        .feature-item:nth-child(even) {
+            border-right: none;
+        }
+
+        .feature-item:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+
+        .feature-item:hover {
+            background: var(--surface-raised);
+        }
+
+        .feature-item h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .feature-item .feature-icon {
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            opacity: 0.8;
+        }
+
+        /* ============ TECH STACK ============ */
+        .tech-stack {
+            background: var(--gradient-mesh);
+        }
+
+        .tech-pills {
+            margin-top: 3rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .tech-pill {
+            padding: 0.6rem 1.2rem;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .tech-pill:hover {
+            border-color: var(--teal);
+            color: var(--chalk);
+            transform: translateY(-2px);
+        }
+
+        /* ============ CTA ============ */
+        .cta-section {
+            text-align: center;
+            padding: 10rem 3rem;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(42, 138, 122, 0.06) 0%, transparent 60%);
+        }
+
+        .cta-section .section-title {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-section .section-desc {
+            max-width: 500px;
+            margin: 1rem auto 0;
+        }
+
+        .cta-actions {
+            margin-top: 2.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* ============ FOOTER ============ */
+        footer {
+            padding: 3rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--chalk);
+        }
+
+        /* ============ SCROLL ANIMATIONS ============ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .arch-grid {
+                grid-template-columns: 1fr;
+            }
+            .results-showcase {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+            .nav-links {
+                display: none;
+            }
+            section {
+                padding: 5rem 1.5rem;
+            }
+            .hero {
+                padding: 7rem 1.5rem 3rem;
+            }
+            .hero-stats {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+            .feature-item {
+                border-right: none !important;
+            }
+            .feature-item:last-child {
+                border-bottom: none;
+            }
+            .cta-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            footer {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="nav-logo">Neuro<span>Grade</span></a>
+        <ul class="nav-links">
+            <li><a href="#pipeline">Pipeline</a></li>
+            <li><a href="#architecture">Models</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#features">Features</a></li>
+        </ul>
+        <a href="https://github.com" class="nav-cta">View on GitHub</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">MICCAI 2026 Submission</div>
+        <h1 class="hero-title">
+            Multimodal Deep Learning for <span class="highlight">Brain Tumor</span> Grading
+        </h1>
+        <p class="hero-subtitle">
+            A 3-model stacking ensemble leveraging T1, T1ce, T2, and FLAIR MRI sequences for accurate Low-Grade vs High-Grade Glioma classification on BraTS 2018.
+        </p>
+        <div class="hero-actions">
+            <a href="#architecture" class="btn-primary">
+                Explore Architecture
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <a href="#results" class="btn-secondary">View Results</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-value">96.8%</span>
+                <span class="stat-label">Ensemble Accuracy</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">285</span>
+                <span class="stat-label">Patient Volumes</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">4</span>
+                <span class="stat-label">MRI Modalities</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">5-Fold</span>
+                <span class="stat-label">Cross Validation</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section class="pipeline" id="pipeline">
+        <div class="reveal">
+            <span class="section-label">Processing Pipeline</span>
+            <h2 class="section-title">From Raw MRI to Clinical Prediction</h2>
+            <p class="section-desc">
+                A rigorous 4-stage preprocessing pipeline transforms raw NIfTI volumes into standardized 128&sup3; tensors ready for deep learning.
+            </p>
+        </div>
+        <div class="pipeline-grid reveal">
+            <div class="pipeline-card">
+                <span class="pipeline-card-number">01</span>
+                <div class="pipeline-card-icon">&#x2726;</div>
+                <h3>N4 Bias Correction</h3>
+                <p>Removes intensity non-uniformity artifacts inherent to MRI acquisition using SimpleITK's N4ITK algorithm.</p>
+            </div>
+            <div class="pipeline-card">
+                <span class="pipeline-card-number">02</span>
+                <div class="pipeline-card-icon">&#x2261;</div>
+                <h3>Z-Score Normalization</h3>
+                <p>Standardizes voxel intensities to zero mean, unit variance per volume — essential for stable gradient-based training.</p>
+            </div>
+            <div class="pipeline-card">
+                <span class="pipeline-card-number">03</span>
+                <div class="pipeline-card-icon">&#x29C9;</div>
+                <h3>ROI Cropping</h3>
+                <p>Extracts the brain region of interest, removing empty background voxels to focus computation on clinically relevant tissue.</p>
+            </div>
+            <div class="pipeline-card">
+                <span class="pipeline-card-number">04</span>
+                <div class="pipeline-card-icon">&#x25A3;</div>
+                <h3>Isotropic Resize</h3>
+                <p>Resamples all volumes to a uniform 128 &times; 128 &times; 128 grid, enabling batched 3D convolutions across patients.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="architecture" id="architecture">
+        <div class="reveal">
+            <span class="section-label">Model Architecture</span>
+            <h2 class="section-title">Three Complementary Learning Paradigms</h2>
+            <p class="section-desc">
+                Each base learner captures distinct spatial and contextual patterns, combined via out-of-fold stacking with logistic regression meta-learning.
+            </p>
+        </div>
+        <div class="arch-grid reveal">
+            <div class="arch-card">
+                <span class="arch-card-tag">3D CNN</span>
+                <h3>ResNet50-3D</h3>
+                <p>Deep residual network operating on full 3D volumes. Pretrained with MedicalNet weights for robust low-level feature extraction from multimodal MRI.</p>
+                <div class="arch-card-metric">
+                    <span class="value">50</span>
+                    <span class="label">Layers Deep</span>
+                </div>
+            </div>
+            <div class="arch-card">
+                <span class="arch-card-tag">Transformer</span>
+                <h3>SwinUNETR</h3>
+                <p>Shifted-window vision transformer encoder from MONAI. Captures long-range spatial dependencies that CNNs miss via hierarchical self-attention.</p>
+                <div class="arch-card-metric">
+                    <span class="value">128&sup3;</span>
+                    <span class="label">Input Resolution</span>
+                </div>
+            </div>
+            <div class="arch-card">
+                <span class="arch-card-tag">MIL</span>
+                <h3>DualStream MIL</h3>
+                <p>Multiple instance learning on entropy-selected 2D slices. Dual attention + critical-instance streams identify the most diagnostically informative regions.</p>
+                <div class="arch-card-metric">
+                    <span class="value">16</span>
+                    <span class="label">Top-k Slices</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section class="results" id="results">
+        <div class="reveal">
+            <span class="section-label">Performance</span>
+            <h2 class="section-title">Clinical-Grade Classification Metrics</h2>
+            <p class="section-desc">
+                Evaluated via stratified 5-fold cross-validation at the patient level with Platt-calibrated probability outputs.
+            </p>
+        </div>
+        <div class="results-showcase reveal">
+            <div class="result-block highlight-block">
+                <h4>Ensemble (Stacking)</h4>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span class="number">0.968</span>
+                        <span class="desc">Accuracy</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">0.98</span>
+                        <span class="desc">AUC-ROC</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">0.96</span>
+                        <span class="desc">F1 Score</span>
+                    </div>
+                </div>
+            </div>
+            <div class="result-block">
+                <h4>Operating Thresholds</h4>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span class="number">&tau;=0.22</span>
+                        <span class="desc">Default</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">&tau;=0.19</span>
+                        <span class="desc">High Sensitivity</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">&tau;=0.41</span>
+                        <span class="desc">Calibrated</span>
+                    </div>
+                </div>
+            </div>
+            <div class="result-block">
+                <h4>ResNet50-3D (Base)</h4>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span class="number">0.94</span>
+                        <span class="desc">Accuracy</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">0.96</span>
+                        <span class="desc">AUC-ROC</span>
+                    </div>
+                </div>
+            </div>
+            <div class="result-block">
+                <h4>SwinUNETR (Base)</h4>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span class="number">0.93</span>
+                        <span class="desc">Accuracy</span>
+                    </div>
+                    <div class="metric">
+                        <span class="number">0.95</span>
+                        <span class="desc">AUC-ROC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="reveal">
+            <span class="section-label">Capabilities</span>
+            <h2 class="section-title">Built for Reproducibility & Clinical Translation</h2>
+        </div>
+        <div class="features-list reveal">
+            <div class="feature-item">
+                <span class="feature-icon">&#x1F52C;</span>
+                <h3>Grad-CAM 3D Interpretability</h3>
+                <p>Volumetric gradient-weighted activation maps reveal which brain regions drive each classification decision.</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">&#x2696;</span>
+                <h3>Platt Calibration</h3>
+                <p>Post-hoc probability calibration ensures predicted confidences align with true diagnostic frequencies.</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">&#x1F9EC;</span>
+                <h3>Entropy-Based Slice Selection</h3>
+                <p>Information-theoretic ranking surfaces the most diagnostically rich axial slices for the MIL pathway.</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">&#x26A1;</span>
+                <h3>MONAI-Powered Augmentation</h3>
+                <p>3D spatial transforms — random affine, elastic deformation, intensity shifts — with medical imaging best practices.</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">&#x1F504;</span>
+                <h3>Out-of-Fold Stacking</h3>
+                <p>Patient-level stratified k-fold ensures no data leakage while generating diverse meta-learner training signals.</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">&#x1F3AF;</span>
+                <h3>Tunable Clinical Thresholds</h3>
+                <p>Sensitivity–specificity trade-off controllable at inference time for different clinical screening scenarios.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="tech-stack">
+        <div class="reveal">
+            <span class="section-label">Technology</span>
+            <h2 class="section-title">Powered by Modern Medical AI</h2>
+            <p class="section-desc">
+                Standing on the shoulders of state-of-the-art frameworks and libraries purpose-built for medical image analysis.
+            </p>
+        </div>
+        <div class="tech-pills reveal">
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">MONAI</span>
+            <span class="tech-pill">SimpleITK</span>
+            <span class="tech-pill">torchvision</span>
+            <span class="tech-pill">scikit-learn</span>
+            <span class="tech-pill">MedicalNet</span>
+            <span class="tech-pill">Swin Transformer</span>
+            <span class="tech-pill">NIfTI Format</span>
+            <span class="tech-pill">BraTS 2018</span>
+            <span class="tech-pill">5-Fold CV</span>
+            <span class="tech-pill">Grad-CAM</span>
+            <span class="tech-pill">XGBoost</span>
+            <span class="tech-pill">Platt Scaling</span>
+            <span class="tech-pill">Logistic Regression</span>
+            <span class="tech-pill">YAML Config</span>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="reveal">
+            <span class="section-label">Get Started</span>
+            <h2 class="section-title">Reproduce Our Results or Run Inference on New Patients</h2>
+            <p class="section-desc">
+                Fully open-source pipeline with stage-by-stage preprocessing, training scripts, and CLI-based ensemble inference.
+            </p>
+            <div class="cta-actions">
+                <a href="https://github.com" class="btn-primary">
+                    Clone Repository
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <a href="#pipeline" class="btn-secondary">Read Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <span class="footer-left">NeuroGrade &mdash; Multimodal Deep Learning Framework &copy; 2026</span>
+        <ul class="footer-links">
+            <li><a href="#pipeline">Pipeline</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="https://github.com">GitHub</a></li>
+        </ul>
+    </footer>
+
+    <!-- Scroll Reveal Script -->
+    <script>
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        reveals.forEach(el => observer.observe(el));
+
+        // Parallax-like subtle nav hide on scroll
+        let lastScroll = 0;
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            const current = window.scrollY;
+            if (current > lastScroll && current > 100) {
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                nav.style.transform = 'translateY(0)';
+            }
+            lastScroll = current;
+        }, { passive: true });
+    </script>
+</body>
+</html>
