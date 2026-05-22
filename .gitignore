@@ -1,3 +1,11 @@
+# Node.js (frontend)
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
 # Data directories (large files, not tracked)
 data/raw/
 data/processed/
