@@ -3,642 +3,1220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroGrade — Multimodal Brain Tumor Classification</title>
+    <title>NeuroGrade — Multimodal Brain Tumor Classification Framework</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ink: #0a0c10;
-            --chalk: #f4f1ec;
-            --accent: #c44b3f;
-            --accent-glow: #e85d50;
-            --teal: #2a8a7a;
-            --teal-dim: #1d6b5e;
-            --surface: #12151c;
-            --surface-raised: #1a1e28;
-            --surface-glass: rgba(26, 30, 40, 0.7);
-            --border: rgba(244, 241, 236, 0.08);
-            --text-muted: rgba(244, 241, 236, 0.55);
-            --text-secondary: rgba(244, 241, 236, 0.75);
-            --gradient-mesh: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(42, 138, 122, 0.12) 0%, transparent 60%),
-                             radial-gradient(ellipse 50% 80% at 80% 90%, rgba(196, 75, 63, 0.08) 0%, transparent 50%);
+            --bg-primary: #060810;
+            --bg-secondary: #0c0f1a;
+            --bg-elevated: #111627;
+            --bg-glass: rgba(12, 15, 26, 0.85);
+            --text-primary: #e8e6e1;
+            --text-secondary: rgba(232, 230, 225, 0.65);
+            --text-dim: rgba(232, 230, 225, 0.4);
+            --accent-cyan: #00d4aa;
+            --accent-cyan-dim: #00a385;
+            --accent-cyan-glow: rgba(0, 212, 170, 0.15);
+            --accent-warm: #f0724b;
+            --accent-warm-glow: rgba(240, 114, 75, 0.12);
+            --accent-violet: #8b5cf6;
+            --accent-violet-glow: rgba(139, 92, 246, 0.1);
+            --border: rgba(232, 230, 225, 0.06);
+            --border-active: rgba(0, 212, 170, 0.25);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html {
             scroll-behavior: smooth;
             font-size: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-cyan-dim) var(--bg-primary);
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--ink);
-            color: var(--chalk);
+            font-family: 'Manrope', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Noise texture overlay */
-        body::before {
+        /* Grain overlay */
+        body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.018;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 10000;
         }
 
-        /* ============ NAV ============ */
-        nav {
+        /* ========== NAVIGATION ========== */
+        .nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
-            padding: 1.25rem 3rem;
+            z-index: 1000;
+            padding: 1rem 2.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            backdrop-filter: blur(20px) saturate(1.2);
-            background: rgba(10, 12, 16, 0.75);
+            backdrop-filter: blur(24px) saturate(1.3);
+            background: rgba(6, 8, 16, 0.8);
             border-bottom: 1px solid var(--border);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .nav-logo {
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.5rem;
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
             letter-spacing: -0.02em;
-            color: var(--chalk);
+            color: var(--text-primary);
             text-decoration: none;
         }
 
-        .nav-logo span {
-            color: var(--teal);
+        .nav-brand em {
+            color: var(--accent-cyan);
+            font-style: italic;
         }
 
-        .nav-links {
+        .nav-menu {
             display: flex;
-            gap: 2.5rem;
+            gap: 2.2rem;
             list-style: none;
         }
 
-        .nav-links a {
-            color: var(--text-muted);
+        .nav-menu a {
+            color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 400;
-            letter-spacing: 0.02em;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--chalk);
-        }
-
-        .nav-cta {
-            padding: 0.6rem 1.4rem;
-            background: var(--teal);
-            color: var(--chalk);
-            border: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 500;
-            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: color 0.25s;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-cyan);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover { color: var(--text-primary); }
+        .nav-menu a:hover::after { width: 100%; }
+
+        .nav-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.3rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--bg-primary);
+            background: var(--accent-cyan);
+            border-radius: 100px;
             text-decoration: none;
-            transition: background 0.3s, transform 0.2s;
+            transition: all 0.3s;
         }
 
-        .nav-cta:hover {
-            background: var(--teal-dim);
+        .nav-github:hover {
+            background: var(--accent-cyan-dim);
             transform: translateY(-1px);
+            box-shadow: 0 6px 24px var(--accent-cyan-glow);
         }
 
-        /* ============ HERO ============ */
+        /* ========== HERO ========== */
         .hero {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 8rem 3rem 4rem;
+            padding: 8rem 2.5rem 5rem;
             position: relative;
-            background: var(--gradient-mesh);
+            overflow: hidden;
         }
 
-        .hero::after {
-            content: '';
+        .hero-bg {
             position: absolute;
-            top: 15%;
-            right: -5%;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(42, 138, 122, 0.06) 0%, transparent 70%);
-            animation: pulse-slow 8s ease-in-out infinite;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 20%, var(--accent-cyan-glow) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 60% at 85% 75%, var(--accent-violet-glow) 0%, transparent 45%),
+                radial-gradient(ellipse 60% 40% at 50% 100%, var(--accent-warm-glow) 0%, transparent 40%);
+            z-index: -1;
         }
 
-        @keyframes pulse-slow {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.15); opacity: 0.7; }
+        /* Animated orbital rings */
+        .hero-orbital {
+            position: absolute;
+            top: 50%;
+            right: -5%;
+            width: 650px;
+            height: 650px;
+            transform: translateY(-50%);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .hero-orbital .ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            animation: spin 40s linear infinite;
+        }
+
+        .hero-orbital .ring:nth-child(2) {
+            inset: 60px;
+            animation-duration: 30s;
+            animation-direction: reverse;
+            border-color: rgba(0, 212, 170, 0.08);
+        }
+
+        .hero-orbital .ring:nth-child(3) {
+            inset: 130px;
+            animation-duration: 50s;
+            border-color: rgba(139, 92, 246, 0.06);
+        }
+
+        .hero-orbital .dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            top: 50%;
+            left: -3px;
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            max-width: 780px;
+            position: relative;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 1rem;
-            background: var(--surface-raised);
+            gap: 0.6rem;
+            padding: 0.45rem 1.1rem;
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 100px;
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            width: fit-content;
-            animation: fade-up 0.8s ease-out both;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2.5rem;
+            animation: hero-fade 0.8s ease-out both;
         }
 
-        .hero-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
+        .hero-badge .pulse {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: var(--teal);
-            animation: blink 2s infinite;
+            background: var(--accent-cyan);
+            animation: pulse 2.5s infinite;
+            box-shadow: 0 0 8px var(--accent-cyan);
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
         }
 
         .hero-title {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(3.2rem, 7.5vw, 6.5rem);
-            line-height: 1.05;
-            letter-spacing: -0.03em;
-            max-width: 900px;
-            animation: fade-up 0.8s ease-out 0.15s both;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 7vw, 5.8rem);
+            font-weight: 900;
+            line-height: 1.02;
+            letter-spacing: -0.035em;
+            margin-bottom: 1.8rem;
+            animation: hero-fade 0.8s ease-out 0.1s both;
         }
 
-        .hero-title .highlight {
-            color: var(--teal);
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, #5ee7c4 50%, var(--accent-violet) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-title .italic {
             font-style: italic;
+            font-weight: 400;
         }
 
-        .hero-subtitle {
-            margin-top: 1.5rem;
-            font-size: 1.15rem;
+        .hero-desc {
+            font-size: 1.1rem;
             color: var(--text-secondary);
-            max-width: 560px;
-            line-height: 1.7;
-            animation: fade-up 0.8s ease-out 0.3s both;
+            max-width: 600px;
+            line-height: 1.75;
+            margin-bottom: 2.5rem;
+            animation: hero-fade 0.8s ease-out 0.2s both;
         }
 
         .hero-actions {
-            margin-top: 2.5rem;
             display: flex;
             gap: 1rem;
-            animation: fade-up 0.8s ease-out 0.45s both;
+            margin-bottom: 5rem;
+            animation: hero-fade 0.8s ease-out 0.3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.9rem 2rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
-            padding: 0.85rem 2rem;
-            background: var(--teal);
-            color: var(--chalk);
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
         }
 
         .btn-primary:hover {
-            background: var(--teal-dim);
+            background: #00eabc;
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(42, 138, 122, 0.2);
+            box-shadow: 0 12px 40px var(--accent-cyan-glow);
         }
 
-        .btn-secondary {
-            padding: 0.85rem 2rem;
+        .btn-outline {
             background: transparent;
-            color: var(--chalk);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 400;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
+            color: var(--text-primary);
+            border: 1px solid rgba(232, 230, 225, 0.15);
         }
 
-        .btn-secondary:hover {
-            border-color: var(--text-muted);
-            background: var(--surface-raised);
+        .btn-outline:hover {
+            border-color: var(--accent-cyan);
+            background: var(--accent-cyan-glow);
         }
 
-        .hero-stats {
-            margin-top: 5rem;
-            display: flex;
-            gap: 4rem;
-            animation: fade-up 0.8s ease-out 0.6s both;
+        /* Hero Metrics Ticker */
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+            animation: hero-fade 0.8s ease-out 0.45s both;
         }
 
-        .stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-value {
-            font-family: 'Instrument Serif', serif;
-            font-size: 2.5rem;
-            color: var(--chalk);
-            letter-spacing: -0.02em;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        @keyframes fade-up {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ============ SECTION COMMON ============ */
-        section {
-            padding: 7rem 3rem;
+        .hero-metric {
             position: relative;
         }
 
-        .section-label {
+        .hero-metric-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: var(--text-primary);
+        }
+
+        .hero-metric-value .unit {
+            font-size: 0.45em;
+            color: var(--accent-cyan);
+            vertical-align: super;
+        }
+
+        .hero-metric-label {
             font-size: 0.72rem;
+            color: var(--text-dim);
+            margin-top: 0.4rem;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--teal);
-            margin-bottom: 1rem;
+            letter-spacing: 0.08em;
             font-weight: 500;
         }
 
-        .section-title {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            letter-spacing: -0.02em;
-            max-width: 650px;
+        @keyframes hero-fade {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== SECTION BASE ========== */
+        section {
+            padding: 8rem 2.5rem;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--accent-cyan);
+            margin-bottom: 1.2rem;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--accent-cyan);
+        }
+
+        .section-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
             line-height: 1.15;
+            max-width: 680px;
         }
 
-        .section-desc {
-            margin-top: 1rem;
+        .section-subheading {
+            margin-top: 1.2rem;
             color: var(--text-secondary);
-            max-width: 550px;
+            max-width: 580px;
             font-size: 1rem;
-            line-height: 1.7;
+            line-height: 1.75;
         }
 
-        /* ============ PIPELINE ============ */
+        /* ========== PIPELINE ========== */
         .pipeline {
-            background: var(--surface);
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
 
-        .pipeline-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1px;
-            margin-top: 4rem;
-            background: var(--border);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .pipeline-card {
-            background: var(--surface);
-            padding: 2.5rem 2rem;
-            position: relative;
-            transition: background 0.4s;
-        }
-
-        .pipeline-card:hover {
-            background: var(--surface-raised);
-        }
-
-        .pipeline-card-number {
-            font-family: 'Instrument Serif', serif;
-            font-size: 3rem;
-            color: rgba(42, 138, 122, 0.15);
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-        }
-
-        .pipeline-card-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(42, 138, 122, 0.1);
-            border: 1px solid rgba(42, 138, 122, 0.2);
+        .pipeline-flow {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-        }
-
-        .pipeline-card h3 {
-            font-size: 1.05rem;
-            font-weight: 500;
-            margin-bottom: 0.6rem;
-        }
-
-        .pipeline-card p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* ============ ARCHITECTURE ============ */
-        .architecture {
-            background: var(--gradient-mesh);
-        }
-
-        .arch-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 0;
             margin-top: 4rem;
-        }
-
-        .arch-card {
-            background: var(--surface-glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
             position: relative;
-            overflow: hidden;
         }
 
-        .arch-card::before {
+        .pipeline-flow::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at top left, rgba(42, 138, 122, 0.04) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+            opacity: 0.2;
+            z-index: 0;
         }
 
-        .arch-card:hover {
+        .pipeline-step {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            padding: 2.5rem 1.8rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .pipeline-step:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+        .pipeline-step:last-child { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+
+        .pipeline-step:hover {
+            background: rgba(17, 22, 39, 0.95);
+            border-color: var(--border-active);
             transform: translateY(-4px);
-            border-color: rgba(42, 138, 122, 0.3);
+            z-index: 2;
         }
 
-        .arch-card:hover::before {
-            opacity: 1;
-        }
-
-        .arch-card-tag {
-            display: inline-block;
-            padding: 0.25rem 0.7rem;
-            background: rgba(42, 138, 122, 0.1);
-            border: 1px solid rgba(42, 138, 122, 0.2);
+        .pipeline-step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--accent-cyan);
+            background: var(--accent-cyan-glow);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            padding: 0.2rem 0.6rem;
             border-radius: 4px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--teal);
-            margin-bottom: 1.5rem;
+            display: inline-block;
+            margin-bottom: 1.2rem;
         }
 
-        .arch-card h3 {
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.6rem;
-            margin-bottom: 0.75rem;
+        .pipeline-step h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
             letter-spacing: -0.01em;
         }
 
-        .arch-card p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
+        .pipeline-step p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .pipeline-step-detail {
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            padding: 0.4rem 0.7rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* ========== ARCHITECTURE ========== */
+        .architecture {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .architecture::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 50% 40% at 20% 80%, var(--accent-cyan-glow) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 50% at 80% 20%, var(--accent-violet-glow) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .arch-diagram {
+            margin: 4rem auto 0;
+            max-width: 900px;
+            position: relative;
+        }
+
+        /* Ensemble formula */
+        .ensemble-formula {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .ensemble-formula-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .ensemble-formula code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--accent-cyan);
+            letter-spacing: -0.01em;
+        }
+
+        .ensemble-formula code .coeff {
+            color: var(--accent-warm);
+        }
+
+        .ensemble-formula code .var {
+            color: var(--text-primary);
+        }
+
+        .arch-models {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .arch-model {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.2rem 1.8rem;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-model::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            transition: opacity 0.3s;
+        }
+
+        .arch-model:nth-child(1)::before { background: var(--accent-warm); }
+        .arch-model:nth-child(2)::before { background: var(--accent-cyan); }
+        .arch-model:nth-child(3)::before { background: var(--accent-violet); }
+
+        .arch-model:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-active);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .arch-model-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 4px;
+        }
+
+        .arch-model:nth-child(1) .arch-model-type { color: var(--accent-warm); background: var(--accent-warm-glow); }
+        .arch-model:nth-child(2) .arch-model-type { color: var(--accent-cyan); background: var(--accent-cyan-glow); }
+        .arch-model:nth-child(3) .arch-model-type { color: var(--accent-violet); background: var(--accent-violet-glow); }
+
+        .arch-model h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.7rem;
+            letter-spacing: -0.02em;
+        }
+
+        .arch-model-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
             line-height: 1.7;
             margin-bottom: 1.5rem;
         }
 
-        .arch-card-metric {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-            padding-top: 1.25rem;
+        .arch-model-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            padding-top: 1.2rem;
             border-top: 1px solid var(--border);
         }
 
-        .arch-card-metric .value {
-            font-family: 'Instrument Serif', serif;
-            font-size: 2rem;
-            color: var(--teal);
+        .arch-model-spec {
+            display: flex;
+            flex-direction: column;
         }
 
-        .arch-card-metric .label {
+        .arch-model-spec .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .arch-model-spec .key {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 0.15rem;
+        }
+
+        /* Meta-learner arrow section */
+        .arch-meta {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .arch-meta-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .arch-meta-arrow::before,
+        .arch-meta-arrow::after {
+            content: '';
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+        }
+
+        .arch-meta-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius-md);
+            padding: 1.5rem 2.5rem;
+        }
+
+        .arch-meta-card h4 {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.78rem;
-            color: var(--text-muted);
+            color: var(--accent-cyan);
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
 
-        /* ============ RESULTS ============ */
+        .arch-meta-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        /* ========== RESULTS ========== */
         .results {
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
-        .results-showcase {
-            margin-top: 4rem;
+        .results-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1.4fr 1fr;
             gap: 2rem;
+            margin-top: 4rem;
         }
 
-        .result-block {
-            background: var(--surface);
+        .results-main {
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+        }
+
+        .results-main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+        }
+
+        .results-main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .results-main-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            background: var(--accent-cyan-glow);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .results-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .results-metric {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
             transition: border-color 0.3s;
         }
 
-        .result-block:hover {
-            border-color: rgba(42, 138, 122, 0.25);
+        .results-metric:hover {
+            border-color: var(--border-active);
         }
 
-        .result-block h4 {
-            font-size: 0.8rem;
+        .results-metric .big {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .results-metric:nth-child(1) .big { color: var(--accent-cyan); }
+        .results-metric:nth-child(2) .big { color: var(--accent-warm); }
+        .results-metric:nth-child(3) .big { color: var(--accent-violet); }
+
+        .results-metric .ci {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .results-metric .name {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .results-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .results-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            flex: 1;
+            transition: border-color 0.3s;
+        }
+
+        .results-card:hover {
+            border-color: var(--border-active);
+        }
+
+        .results-card-title {
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--text-muted);
+            color: var(--text-dim);
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+
+        .results-card-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-card-row:last-child { border-bottom: none; }
+
+        .results-card-row .label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .results-card-row .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .results-card-row .value.green { color: var(--accent-cyan); }
+        .results-card-row .value.warm { color: var(--accent-warm); }
+
+        /* Comparison Table */
+        .comparison {
+            margin-top: 4rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            font-size: 0.84rem;
+        }
+
+        .comparison-table thead {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .comparison-table th {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:last-child td { border-bottom: none; }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 212, 170, 0.02);
+        }
+
+        .comparison-table .model-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-table .highlight-row td {
+            background: rgba(0, 212, 170, 0.04);
+            color: var(--text-primary);
+        }
+
+        .comparison-table .highlight-row .model-name {
+            color: var(--accent-cyan);
+        }
+
+        .comparison-table .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* ========== CALIBRATION ========== */
+        .calibration {
+            position: relative;
+        }
+
+        .calibration-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .cal-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            transition: all 0.3s;
+        }
+
+        .cal-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-3px);
+        }
+
+        .cal-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
         }
 
-        .metrics-row {
+        .cal-card-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
             display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
         }
 
-        .metric {
+        .cal-card:nth-child(1) .cal-card-icon { background: var(--accent-cyan-glow); }
+        .cal-card:nth-child(2) .cal-card-icon { background: var(--accent-warm-glow); }
+
+        .cal-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .cal-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .cal-improvement {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .cal-improvement-item {
             display: flex;
             flex-direction: column;
         }
 
-        .metric .number {
-            font-family: 'Instrument Serif', serif;
-            font-size: 2.8rem;
-            letter-spacing: -0.02em;
-            line-height: 1;
+        .cal-improvement-item .delta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
         }
 
-        .metric .desc {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-top: 0.4rem;
+        .cal-improvement-item .metric-name {
+            font-size: 0.7rem;
+            color: var(--text-dim);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
+            margin-top: 0.2rem;
         }
 
-        .result-block.highlight-block {
-            background: linear-gradient(135deg, rgba(42, 138, 122, 0.08) 0%, var(--surface) 60%);
-            border-color: rgba(42, 138, 122, 0.2);
+        /* Threshold cards */
+        .threshold-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
-        .result-block.highlight-block .number {
-            color: var(--teal);
+        .threshold-card {
+            padding: 1.2rem;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
         }
 
-        /* ============ FEATURES ============ */
+        .threshold-card .tau {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-warm);
+        }
+
+        .threshold-card .use-case {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .threshold-card .stats {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .threshold-card .stats strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ========== FEATURES ========== */
         .features {
-            background: var(--surface);
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
 
-        .features-list {
-            margin-top: 4rem;
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             overflow: hidden;
+            margin-top: 4rem;
         }
 
-        .feature-item {
+        .feature {
+            background: var(--bg-secondary);
             padding: 2.5rem 2rem;
-            border-bottom: 1px solid var(--border);
-            border-right: 1px solid var(--border);
             transition: background 0.3s;
-        }
-
-        .feature-item:nth-child(even) {
-            border-right: none;
-        }
-
-        .feature-item:nth-last-child(-n+2) {
-            border-bottom: none;
-        }
-
-        .feature-item:hover {
-            background: var(--surface-raised);
-        }
-
-        .feature-item h3 {
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-item p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .feature-item .feature-icon {
-            display: inline-block;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            opacity: 0.8;
-        }
-
-        /* ============ TECH STACK ============ */
-        .tech-stack {
-            background: var(--gradient-mesh);
-        }
-
-        .tech-pills {
-            margin-top: 3rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .tech-pill {
-            padding: 0.6rem 1.2rem;
-            background: var(--surface-raised);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            transition: all 0.3s;
-        }
-
-        .tech-pill:hover {
-            border-color: var(--teal);
-            color: var(--chalk);
-            transform: translateY(-2px);
-        }
-
-        /* ============ CTA ============ */
-        .cta-section {
-            text-align: center;
-            padding: 10rem 3rem;
             position: relative;
         }
 
-        .cta-section::before {
+        .feature:hover {
+            background: var(--bg-elevated);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        .feature h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .feature p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ========== TECH ========== */
+        .tech {
+            text-align: center;
+        }
+
+        .tech-cloud {
+            margin-top: 3.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.7rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tech-tag {
+            padding: 0.55rem 1.2rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .tech-tag:hover {
+            color: var(--text-primary);
+            border-color: var(--border-active);
+            background: var(--accent-cyan-glow);
+            transform: translateY(-2px);
+        }
+
+        .tech-tag.primary {
+            border-color: rgba(0, 212, 170, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        /* ========== ABLATION ========== */
+        .ablation {
+            border-top: 1px solid var(--border);
+        }
+
+        .ablation-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .ablation-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            transition: all 0.3s;
+        }
+
+        .ablation-card:hover {
+            border-color: var(--border-active);
+        }
+
+        .ablation-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.7rem;
+        }
+
+        .ablation-card-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .ablation-result {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            padding: 1rem 1.2rem;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .ablation-result .improvement {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .ablation-result .context {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ========== CTA ========== */
+        .cta {
+            text-align: center;
+            padding: 10rem 2.5rem;
+            position: relative;
+        }
+
+        .cta::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
-            height: 500px;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(42, 138, 122, 0.06) 0%, transparent 60%);
+            background: radial-gradient(circle, var(--accent-cyan-glow) 0%, transparent 60%);
+            z-index: -1;
         }
 
-        .cta-section .section-title {
-            max-width: 700px;
+        .cta .section-heading {
+            max-width: 600px;
             margin: 0 auto;
         }
 
-        .cta-section .section-desc {
-            max-width: 500px;
+        .cta .section-subheading {
+            max-width: 480px;
             margin: 1rem auto 0;
         }
 
@@ -649,18 +1227,22 @@
             gap: 1rem;
         }
 
-        /* ============ FOOTER ============ */
-        footer {
-            padding: 3rem;
+        /* ========== FOOTER ========== */
+        .footer {
+            padding: 2.5rem;
             border-top: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
         .footer-left {
-            font-size: 0.82rem;
-            color: var(--text-muted);
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        .footer-left strong {
+            color: var(--text-secondary);
         }
 
         .footer-links {
@@ -670,21 +1252,19 @@
         }
 
         .footer-links a {
-            font-size: 0.82rem;
-            color: var(--text-muted);
+            font-size: 0.78rem;
+            color: var(--text-dim);
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .footer-links a:hover {
-            color: var(--chalk);
-        }
+        .footer-links a:hover { color: var(--accent-cyan); }
 
-        /* ============ SCROLL ANIMATIONS ============ */
+        /* ========== SCROLL REVEAL ========== */
         .reveal {
             opacity: 0;
-            transform: translateY(32px);
-            transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(36px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .reveal.visible {
@@ -692,177 +1272,276 @@
             transform: translateY(0);
         }
 
-        /* ============ RESPONSIVE ============ */
-        @media (max-width: 1024px) {
-            .arch-grid {
-                grid-template-columns: 1fr;
-            }
-            .results-showcase {
-                grid-template-columns: 1fr;
-            }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1100px) {
+            .arch-models { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .calibration-grid { grid-template-columns: 1fr; }
+            .ablation-cards { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-            nav {
-                padding: 1rem 1.5rem;
-            }
-            .nav-links {
-                display: none;
-            }
-            section {
-                padding: 5rem 1.5rem;
-            }
-            .hero {
-                padding: 7rem 1.5rem 3rem;
-            }
-            .hero-stats {
-                gap: 2rem;
-                flex-wrap: wrap;
-            }
-            .features-list {
-                grid-template-columns: 1fr;
-            }
-            .feature-item {
-                border-right: none !important;
-            }
-            .feature-item:last-child {
-                border-bottom: none;
-            }
-            .cta-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-            footer {
-                flex-direction: column;
-                gap: 1.5rem;
-                text-align: center;
-            }
+            .nav { padding: 1rem 1.5rem; }
+            .nav-menu { display: none; }
+            section { padding: 5rem 1.5rem; }
+            .hero { padding: 7rem 1.5rem 3rem; }
+            .hero-metrics { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+            .hero-orbital { display: none; }
+            .pipeline-flow { flex-direction: column; }
+            .pipeline-step { border-radius: var(--radius-md) !important; }
+            .features-grid { grid-template-columns: 1fr; }
+            .results-metrics { grid-template-columns: 1fr; }
+            .comparison-table { font-size: 0.75rem; }
+            .comparison-table th, .comparison-table td { padding: 0.7rem; }
+            .cta-actions { flex-direction: column; align-items: center; }
+            .footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+            .threshold-cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+
     <!-- Navigation -->
-    <nav>
-        <a href="#" class="nav-logo">Neuro<span>Grade</span></a>
-        <ul class="nav-links">
+    <nav class="nav">
+        <a href="#" class="nav-brand">Neuro<em>Grade</em></a>
+        <ul class="nav-menu">
+            <li><a href="#setup">Setup</a></li>
             <li><a href="#pipeline">Pipeline</a></li>
             <li><a href="#architecture">Models</a></li>
             <li><a href="#results">Results</a></li>
-            <li><a href="#features">Features</a></li>
+            <li><a href="#calibration">Calibration</a></li>
+            <li><a href="#ablation">Ablation</a></li>
         </ul>
-        <a href="https://github.com" class="nav-cta">View on GitHub</a>
+        <a href="https://github.com" class="nav-github">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Repository
+        </a>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-badge">MICCAI 2026 Submission</div>
-        <h1 class="hero-title">
-            Multimodal Deep Learning for <span class="highlight">Brain Tumor</span> Grading
-        </h1>
-        <p class="hero-subtitle">
-            A 3-model stacking ensemble leveraging T1, T1ce, T2, and FLAIR MRI sequences for accurate Low-Grade vs High-Grade Glioma classification on BraTS 2018.
-        </p>
-        <div class="hero-actions">
-            <a href="#architecture" class="btn-primary">
-                Explore Architecture
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-            <a href="#results" class="btn-secondary">View Results</a>
+        <div class="hero-bg"></div>
+        <div class="hero-orbital">
+            <div class="ring"><div class="dot"></div></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
         </div>
-        <div class="hero-stats">
-            <div class="stat">
-                <span class="stat-value">96.8%</span>
-                <span class="stat-label">Ensemble Accuracy</span>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="pulse"></span>
+                MICCAI 2026 &mdash; BraTS 2018 Dataset
             </div>
-            <div class="stat">
-                <span class="stat-value">285</span>
-                <span class="stat-label">Patient Volumes</span>
+            <h1 class="hero-title">
+                <span class="gradient-text">Multimodal</span> Deep Learning for Brain Tumor <span class="italic">Grade Classification</span>
+            </h1>
+            <p class="hero-desc">
+                A calibrated, robust multimodal ensemble framework achieving AUC 0.9114 &plusmn; 0.0423 and F1 0.9195 &plusmn; 0.0324 on BraTS 2018. Combines three complementary architectures via OOF stacking with Platt calibration, providing controllable operating points and balanced error behavior for clinical deployment.
+            </p>
+            <div class="hero-actions">
+                <a href="#architecture" class="btn btn-primary">
+                    Explore Framework
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a href="#results" class="btn btn-outline">View Performance</a>
             </div>
-            <div class="stat">
-                <span class="stat-value">4</span>
-                <span class="stat-label">MRI Modalities</span>
+        </div>
+        <div class="hero-metrics">
+            <div class="hero-metric">
+                <div class="hero-metric-value">0.911<span class="unit">4</span></div>
+                <div class="hero-metric-label">AUC-ROC (5-Fold CV)</div>
             </div>
-            <div class="stat">
-                <span class="stat-value">5-Fold</span>
-                <span class="stat-label">Cross Validation</span>
+            <div class="hero-metric">
+                <div class="hero-metric-value">0.919<span class="unit">5</span></div>
+                <div class="hero-metric-label">F1 Score (Mean)</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-value">0.970<span class="unit">5</span></div>
+                <div class="hero-metric-label">PR-AUC (n=285)</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-value">0.936<span class="unit">5</span></div>
+                <div class="hero-metric-label">F1 @ &tau;=0.41 (Calibrated)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experimental Setup -->
+    <section class="pipeline" id="setup" style="border-bottom: none; padding-bottom: 0;">
+        <div class="section-header reveal">
+            <div class="section-tag">Experimental Setup</div>
+            <h2 class="section-heading">BraTS 2018 &mdash; 5-Fold Stratified Cross-Validation</h2>
+            <p class="section-subheading">
+                285 patients (210 HGG, 75 LGG) with 2.8:1 class imbalance ratio. Patient-level splitting ensures no data leakage across folds. Framework prioritizes probability reliability, operating point controllability, and balanced error behavior.
+            </p>
+        </div>
+        <div class="pipeline-flow reveal">
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">DATASET</span>
+                <h3>BraTS 2018</h3>
+                <p>285 patients with multimodal MRI: T1, T1ce, T2, FLAIR (4-channel early fusion). Binary labels: HGG vs LGG.</p>
+                <span class="pipeline-step-detail">210 HGG / 75 LGG</span>
+            </div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">VALIDATION</span>
+                <h3>5-Fold Stratified CV</h3>
+                <p>~57 patients per fold (~42 HGG, ~15 LGG). Stratification preserves class ratio. All splits at patient level.</p>
+                <span class="pipeline-step-detail">seed: 42 | patient-level</span>
+            </div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">META-LEARNER</span>
+                <h3>OOF Training</h3>
+                <p>Out-of-fold predictions from all base models. Each patient predicted only when held-out from training.</p>
+                <span class="pipeline-step-detail">n=285 per model</span>
+            </div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">CALIBRATION</span>
+                <h3>Platt Scaling</h3>
+                <p>70% OOF for calibration fitting (199 samples). 30% held-out for threshold selection (86 samples).</p>
+                <span class="pipeline-step-detail">disjoint splits</span>
             </div>
         </div>
     </section>
 
     <!-- Pipeline -->
-    <section class="pipeline" id="pipeline">
-        <div class="reveal">
-            <span class="section-label">Processing Pipeline</span>
-            <h2 class="section-title">From Raw MRI to Clinical Prediction</h2>
-            <p class="section-desc">
-                A rigorous 4-stage preprocessing pipeline transforms raw NIfTI volumes into standardized 128&sup3; tensors ready for deep learning.
+    <section class="pipeline" id="pipeline" style="border-top: none;">
+        <div class="section-header reveal">
+            <div class="section-tag">Preprocessing Pipeline</div>
+            <h2 class="section-heading">Four-Stage Transformation from Raw MRI to Training-Ready Tensors</h2>
+            <p class="section-subheading">
+                Disk-based preprocessing pipeline using SimpleITK, converting raw NIfTI volumes into standardized 128&sup3; tensors. Runtime augmentation via MONAI applied only during training.
             </p>
         </div>
-        <div class="pipeline-grid reveal">
-            <div class="pipeline-card">
-                <span class="pipeline-card-number">01</span>
-                <div class="pipeline-card-icon">&#x2726;</div>
+        <div class="pipeline-flow reveal">
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">STAGE 01</span>
                 <h3>N4 Bias Correction</h3>
-                <p>Removes intensity non-uniformity artifacts inherent to MRI acquisition using SimpleITK's N4ITK algorithm.</p>
+                <p>Removes scanner-specific intensity inhomogeneity using iterative B-spline fitting with Otsu masking.</p>
+                <span class="pipeline-step-detail">iterations: [40,40,30,20]</span>
             </div>
-            <div class="pipeline-card">
-                <span class="pipeline-card-number">02</span>
-                <div class="pipeline-card-icon">&#x2261;</div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">STAGE 02</span>
                 <h3>Z-Score Normalization</h3>
-                <p>Standardizes voxel intensities to zero mean, unit variance per volume — essential for stable gradient-based training.</p>
+                <p>Per-patient voxel-wise standardization on brain voxels only. Background preserved at zero.</p>
+                <span class="pipeline-step-detail">(x - &mu;) / (&sigma; + 1e-8)</span>
             </div>
-            <div class="pipeline-card">
-                <span class="pipeline-card-number">03</span>
-                <div class="pipeline-card-icon">&#x29C9;</div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">STAGE 03</span>
                 <h3>ROI Cropping</h3>
-                <p>Extracts the brain region of interest, removing empty background voxels to focus computation on clinically relevant tissue.</p>
+                <p>Union bounding box across all four modalities with 10-voxel padding, eliminating empty background.</p>
+                <span class="pipeline-step-detail">mode: union | pad: 10</span>
             </div>
-            <div class="pipeline-card">
-                <span class="pipeline-card-number">04</span>
-                <div class="pipeline-card-icon">&#x25A3;</div>
+            <div class="pipeline-step">
+                <span class="pipeline-step-num">STAGE 04</span>
                 <h3>Isotropic Resize</h3>
-                <p>Resamples all volumes to a uniform 128 &times; 128 &times; 128 grid, enabling batched 3D convolutions across patients.</p>
+                <p>Linear interpolation to fixed grid enabling batched 3D convolutions across the full patient cohort.</p>
+                <span class="pipeline-step-detail">128 &times; 128 &times; 128</span>
             </div>
         </div>
     </section>
 
     <!-- Architecture -->
     <section class="architecture" id="architecture">
-        <div class="reveal">
-            <span class="section-label">Model Architecture</span>
-            <h2 class="section-title">Three Complementary Learning Paradigms</h2>
-            <p class="section-desc">
-                Each base learner captures distinct spatial and contextual patterns, combined via out-of-fold stacking with logistic regression meta-learning.
+        <div class="section-header reveal">
+            <div class="section-tag">Model Architecture</div>
+            <h2 class="section-heading">Three Complementary Architectures with Complementary Inductive Biases</h2>
+            <p class="section-subheading">
+                CNN captures local spatial hierarchies, Transformer captures long-range dependencies via self-attention, MIL identifies critical diagnostic slices. Unified through patient-level OOF logistic stacking with balanced class weights.
             </p>
         </div>
-        <div class="arch-grid reveal">
-            <div class="arch-card">
-                <span class="arch-card-tag">3D CNN</span>
-                <h3>ResNet50-3D</h3>
-                <p>Deep residual network operating on full 3D volumes. Pretrained with MedicalNet weights for robust low-level feature extraction from multimodal MRI.</p>
-                <div class="arch-card-metric">
-                    <span class="value">50</span>
-                    <span class="label">Layers Deep</span>
+
+        <div class="arch-diagram">
+            <div class="ensemble-formula reveal">
+                <div class="ensemble-formula-label">Learned Ensemble Decision Function</div>
+                <code>P(HGG) = &sigma;(<span class="coeff">4.06</span>&middot;<span class="var">p<sub>swin</sub></span> + <span class="coeff">0.89</span>&middot;<span class="var">p<sub>mil</sub></span> + <span class="coeff">0.54</span>&middot;<span class="var">p<sub>resnet</sub></span> <span class="coeff">- 2.40</span>)</code>
+            </div>
+
+            <div class="arch-models reveal">
+                <div class="arch-model">
+                    <span class="arch-model-type">3D CNN</span>
+                    <h3>ResNet50-3D</h3>
+                    <p class="arch-model-desc">Deep residual network with MedicalNet pretraining. Broad coverage baseline capturing holistic volume-level texture and morphology through local spatial hierarchies. Recall: 1.000, Specificity: 0.107.</p>
+                    <div class="arch-model-specs">
+                        <div class="arch-model-spec">
+                            <span class="val">0.5994</span>
+                            <span class="key">AUC &plusmn; 0.124</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">+0.54</span>
+                            <span class="key">Coefficient</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">(B,4,128&sup3;)</span>
+                            <span class="key">Input</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">0.8629</span>
+                            <span class="key">F1 Score</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="arch-model">
+                    <span class="arch-model-type">Transformer</span>
+                    <h3>SwinUNETR-3D</h3>
+                    <p class="arch-model-desc">Shifted-window vision transformer encoder from MONAI. Dominant predictor (coefficient 4.06) capturing hierarchical multi-scale features. Best single-model: AUC 0.9140, Specificity 0.8133.</p>
+                    <div class="arch-model-specs">
+                        <div class="arch-model-spec">
+                            <span class="val">0.9140</span>
+                            <span class="key">AUC &plusmn; 0.041</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">+4.06</span>
+                            <span class="key">Coefficient</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">(B,4,128&sup3;)</span>
+                            <span class="key">Input</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">0.9227</span>
+                            <span class="key">F1 Score</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="arch-model">
+                    <span class="arch-model-type">Multiple Instance Learning</span>
+                    <h3>DualStreamMIL-3D</h3>
+                    <p class="arch-model-desc">Entropy-selected 2D slice bags (top-16) with dual attention + critical-instance streams. Provides complementary signal on 53 uncertain cases. Recall: 0.9571, FN: 1.8/fold.</p>
+                    <div class="arch-model-specs">
+                        <div class="arch-model-spec">
+                            <span class="val">0.7990</span>
+                            <span class="key">AUC &plusmn; 0.091</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">+0.89</span>
+                            <span class="key">Coefficient</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">(B,16,4,224&sup2;)</span>
+                            <span class="key">Input</span>
+                        </div>
+                        <div class="arch-model-spec">
+                            <span class="val">0.8822</span>
+                            <span class="key">F1 Score</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="arch-card">
-                <span class="arch-card-tag">Transformer</span>
-                <h3>SwinUNETR</h3>
-                <p>Shifted-window vision transformer encoder from MONAI. Captures long-range spatial dependencies that CNNs miss via hierarchical self-attention.</p>
-                <div class="arch-card-metric">
-                    <span class="value">128&sup3;</span>
-                    <span class="label">Input Resolution</span>
-                </div>
-            </div>
-            <div class="arch-card">
-                <span class="arch-card-tag">MIL</span>
-                <h3>DualStream MIL</h3>
-                <p>Multiple instance learning on entropy-selected 2D slices. Dual attention + critical-instance streams identify the most diagnostically informative regions.</p>
-                <div class="arch-card-metric">
-                    <span class="value">16</span>
-                    <span class="label">Top-k Slices</span>
+
+            <div class="arch-meta reveal">
+                <div class="arch-meta-arrow">OOF Stacking &rarr; Meta-Learner &rarr; Calibration</div>
+                <div class="arch-meta-card">
+                    <div>
+                        <h4>Logistic Regression Meta-Learner</h4>
+                        <p>solver=lbfgs, C=1.0, L2 penalty, class_weight=balanced, seed=42</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h4>Platt Calibration + Threshold Selection</h4>
+                        <p>70/30 disjoint split &rarr; &tau;=0.41 (balanced) or &tau;=0.38 (high-sensitivity)</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -870,71 +1549,214 @@
 
     <!-- Results -->
     <section class="results" id="results">
-        <div class="reveal">
-            <span class="section-label">Performance</span>
-            <h2 class="section-title">Clinical-Grade Classification Metrics</h2>
-            <p class="section-desc">
-                Evaluated via stratified 5-fold cross-validation at the patient level with Platt-calibrated probability outputs.
+        <div class="section-header reveal">
+            <div class="section-tag">Cross-Validation Performance</div>
+            <h2 class="section-heading">Ensemble vs. Base Models &mdash; 5-Fold Stratified CV</h2>
+            <p class="section-subheading">
+                All metrics reported as mean &plusmn; std across 5 folds. Bootstrap 95% CIs computed with 1000 iterations. Paired t-test ensemble vs. SwinUNETR: t=-0.42, p=0.687 (no significant difference in AUC).
             </p>
         </div>
-        <div class="results-showcase reveal">
-            <div class="result-block highlight-block">
-                <h4>Ensemble (Stacking)</h4>
-                <div class="metrics-row">
-                    <div class="metric">
-                        <span class="number">0.968</span>
-                        <span class="desc">Accuracy</span>
+
+        <div class="results-grid reveal">
+            <div class="results-main">
+                <div class="results-main-header">
+                    <span class="results-main-title">Ensemble (Logistic Regression Meta-Learner)</span>
+                    <span class="results-main-badge">5-Fold CV, Mean &plusmn; Std</span>
+                </div>
+                <div class="results-metrics">
+                    <div class="results-metric">
+                        <div class="big">0.911</div>
+                        <span class="ci">95% CI [0.8755, 0.9527]</span>
+                        <div class="name">AUC-ROC</div>
                     </div>
-                    <div class="metric">
-                        <span class="number">0.98</span>
-                        <span class="desc">AUC-ROC</span>
+                    <div class="results-metric">
+                        <div class="big">0.920</div>
+                        <span class="ci">95% CI [0.8954, 0.9494]</span>
+                        <div class="name">F1 Score</div>
                     </div>
-                    <div class="metric">
-                        <span class="number">0.96</span>
-                        <span class="desc">F1 Score</span>
+                    <div class="results-metric">
+                        <div class="big">0.881</div>
+                        <span class="ci">95% CI [0.8351, 0.9263]</span>
+                        <div class="name">Accuracy</div>
                     </div>
                 </div>
             </div>
-            <div class="result-block">
-                <h4>Operating Thresholds</h4>
-                <div class="metrics-row">
-                    <div class="metric">
-                        <span class="number">&tau;=0.22</span>
-                        <span class="desc">Default</span>
+
+            <div class="results-sidebar">
+                <div class="results-card">
+                    <div class="results-card-title">Clinical Advantages Over Best Single Model</div>
+                    <div class="results-card-row">
+                        <span class="label">Balanced FN/FP (Ensemble)</span>
+                        <span class="value green">3.4 / 3.4</span>
                     </div>
-                    <div class="metric">
-                        <span class="number">&tau;=0.19</span>
-                        <span class="desc">High Sensitivity</span>
+                    <div class="results-card-row">
+                        <span class="label">Imbalanced FN/FP (SwinUNETR)</span>
+                        <span class="value warm">3.6 / 2.8</span>
                     </div>
-                    <div class="metric">
-                        <span class="number">&tau;=0.41</span>
-                        <span class="desc">Calibrated</span>
+                    <div class="results-card-row">
+                        <span class="label">FN Reduction</span>
+                        <span class="value green">-5.6%</span>
+                    </div>
+                    <div class="results-card-row">
+                        <span class="label">Brier Score Improvement</span>
+                        <span class="value green">-16.8% (0.099 vs 0.119)</span>
+                    </div>
+                    <div class="results-card-row">
+                        <span class="label">ECE Improvement</span>
+                        <span class="value green">-26.9% (0.087 vs 0.119)</span>
+                    </div>
+                </div>
+                <div class="results-card">
+                    <div class="results-card-title">Error Correction &amp; Complementarity</div>
+                    <div class="results-card-row">
+                        <span class="label">Multi-model errors corrected</span>
+                        <span class="value green">10/15 (67%)</span>
+                    </div>
+                    <div class="results-card-row">
+                        <span class="label">SwinUNETR FN &rarr; Ensemble TP</span>
+                        <span class="value">6 patients</span>
+                    </div>
+                    <div class="results-card-row">
+                        <span class="label">MIL FN &rarr; Ensemble TP</span>
+                        <span class="value">2 patients</span>
+                    </div>
+                    <div class="results-card-row">
+                        <span class="label">Multi-model &rarr; Correct</span>
+                        <span class="value">2 patients</span>
                     </div>
                 </div>
             </div>
-            <div class="result-block">
-                <h4>ResNet50-3D (Base)</h4>
-                <div class="metrics-row">
-                    <div class="metric">
-                        <span class="number">0.94</span>
-                        <span class="desc">Accuracy</span>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison reveal">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>AUC</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1</th>
+                        <th>Specificity</th>
+                        <th>FP</th>
+                        <th>FN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="model-name">ResNet50-3D</td>
+                        <td class="mono">0.5994 &plusmn; 0.1240</td>
+                        <td class="mono">0.7649</td>
+                        <td class="mono">0.7594</td>
+                        <td class="mono">1.0000</td>
+                        <td class="mono">0.8629</td>
+                        <td class="mono">0.1067</td>
+                        <td class="mono">13.4</td>
+                        <td class="mono">0.0</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name">SwinUNETR-3D</td>
+                        <td class="mono">0.9140 &plusmn; 0.0414</td>
+                        <td class="mono">0.8877</td>
+                        <td class="mono">0.9352</td>
+                        <td class="mono">0.9143</td>
+                        <td class="mono">0.9227</td>
+                        <td class="mono">0.8133</td>
+                        <td class="mono">2.8</td>
+                        <td class="mono">3.6</td>
+                    </tr>
+                    <tr>
+                        <td class="model-name">DualStreamMIL-3D</td>
+                        <td class="mono">0.7990 &plusmn; 0.0909</td>
+                        <td class="mono">0.8105</td>
+                        <td class="mono">0.8245</td>
+                        <td class="mono">0.9571</td>
+                        <td class="mono">0.8822</td>
+                        <td class="mono">0.4000</td>
+                        <td class="mono">9.0</td>
+                        <td class="mono">1.8</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td class="model-name">Ensemble (Ours)</td>
+                        <td class="mono">0.9114 &plusmn; 0.0423</td>
+                        <td class="mono">0.8807</td>
+                        <td class="mono">0.9252</td>
+                        <td class="mono">0.9190</td>
+                        <td class="mono">0.9195</td>
+                        <td class="mono">&mdash;</td>
+                        <td class="mono">3.4</td>
+                        <td class="mono">3.4</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Calibration -->
+    <section class="calibration" id="calibration">
+        <div class="section-header reveal">
+            <div class="section-tag">Probability Calibration &amp; Clinical Thresholds</div>
+            <h2 class="section-heading">Reliable Probabilities for Clinical Decision Support</h2>
+            <p class="section-subheading">
+                Post-hoc Platt calibration significantly improves probability reliability (Brier: -16.8%, ECE: -26.9%) without degrading AUC. Thresholds re-selected on calibrated probabilities using disjoint held-out data (n=86, seed=42).
+            </p>
+        </div>
+
+        <div class="calibration-grid reveal">
+            <div class="cal-card">
+                <div class="cal-card-header">
+                    <div class="cal-card-icon">&#x2728;</div>
+                    <h3>Calibration Impact (Table 3)</h3>
+                </div>
+                <p class="cal-card-desc">
+                    Trained on 70% of OOF predictions (199 samples). Evaluated on held-out 30% threshold selection set (86 samples). Reliable probability estimates enable clinicians to trust model confidence levels.
+                </p>
+                <div class="cal-improvement">
+                    <div class="cal-improvement-item">
+                        <span class="delta">-16.8%</span>
+                        <span class="metric-name">Brier (0.119 &rarr; 0.099)</span>
                     </div>
-                    <div class="metric">
-                        <span class="number">0.96</span>
-                        <span class="desc">AUC-ROC</span>
+                    <div class="cal-improvement-item">
+                        <span class="delta">-26.9%</span>
+                        <span class="metric-name">ECE (0.119 &rarr; 0.087)</span>
+                    </div>
+                    <div class="cal-improvement-item">
+                        <span class="delta">Preserved</span>
+                        <span class="metric-name">AUC (0.9114)</span>
                     </div>
                 </div>
             </div>
-            <div class="result-block">
-                <h4>SwinUNETR (Base)</h4>
-                <div class="metrics-row">
-                    <div class="metric">
-                        <span class="number">0.93</span>
-                        <span class="desc">Accuracy</span>
+
+            <div class="cal-card">
+                <div class="cal-card-header">
+                    <div class="cal-card-icon">&#x1F3AF;</div>
+                    <h3>Operating Thresholds (Table 6)</h3>
+                </div>
+                <p class="cal-card-desc">
+                    Two policy-optimized operating points on calibrated probabilities. Balanced threshold maximizes F1; high-sensitivity threshold minimizes false negatives for aggressive treatment pathways.
+                </p>
+                <div class="threshold-cards">
+                    <div class="threshold-card">
+                        <div class="tau">&tau; = 0.41</div>
+                        <div class="use-case">Balanced (Max F1)</div>
+                        <div class="stats">
+                            F1: <strong>0.9365</strong><br>
+                            Precision: <strong>0.9365</strong> = Recall<br>
+                            Accuracy: <strong>0.9070</strong><br>
+                            FN: 4 &bull; FP: 4
+                        </div>
                     </div>
-                    <div class="metric">
-                        <span class="number">0.95</span>
-                        <span class="desc">AUC-ROC</span>
+                    <div class="threshold-card">
+                        <div class="tau">&tau; = 0.38</div>
+                        <div class="use-case">High Sensitivity (Min FN)</div>
+                        <div class="stats">
+                            Recall: <strong>0.9524</strong><br>
+                            Precision: <strong>0.9091</strong><br>
+                            F1: <strong>0.9302</strong> &bull; Acc: <strong>0.8953</strong><br>
+                            FN: 3 &bull; FP: 6
+                        </div>
                     </div>
                 </div>
             </div>
@@ -943,104 +1765,133 @@
 
     <!-- Features -->
     <section class="features" id="features">
-        <div class="reveal">
-            <span class="section-label">Capabilities</span>
-            <h2 class="section-title">Built for Reproducibility & Clinical Translation</h2>
+        <div class="section-header reveal">
+            <div class="section-tag">Framework Design Principles</div>
+            <h2 class="section-heading">Clinically Robust, Calibration-Aware, Controllable</h2>
         </div>
-        <div class="features-list reveal">
-            <div class="feature-item">
+        <div class="features-grid reveal">
+            <div class="feature">
                 <span class="feature-icon">&#x1F52C;</span>
-                <h3>Grad-CAM 3D Interpretability</h3>
-                <p>Volumetric gradient-weighted activation maps reveal which brain regions drive each classification decision.</p>
+                <h3>Balanced Error Behavior</h3>
+                <p>FN/FP ratio of 1.00 (3.4/3.4) vs. SwinUNETR's imbalanced 1.29 (3.6/2.8). Enables predictable trade-offs via threshold adjustment for clinical deployment.</p>
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">&#x2696;</span>
-                <h3>Platt Calibration</h3>
-                <p>Post-hoc probability calibration ensures predicted confidences align with true diagnostic frequencies.</p>
-            </div>
-            <div class="feature-item">
+            <div class="feature">
                 <span class="feature-icon">&#x1F9EC;</span>
-                <h3>Entropy-Based Slice Selection</h3>
-                <p>Information-theoretic ranking surfaces the most diagnostically rich axial slices for the MIL pathway.</p>
+                <h3>Probability Reliability</h3>
+                <p>Platt-calibrated outputs mean P(HGG)=0.80 corresponds to ~80% true HGG rate. ECE reduced 26.9% — clinicians can trust confidence levels, not just binary predictions.</p>
             </div>
-            <div class="feature-item">
+            <div class="feature">
+                <span class="feature-icon">&#x1F6E1;</span>
+                <h3>No Data Leakage Guarantee</h3>
+                <p>Patient-level splits (StratifiedKFold, seed=42), OOF integrity verification (7 automated checks), disjoint calibration/threshold sets, forensic audit passed.</p>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">&#x2696;</span>
+                <h3>Complementary Model Behavior</h3>
+                <p>All coefficients positive (no model vetoes). CNN captures textures, Transformer captures global context, MIL identifies critical slices. 67% multi-model errors corrected.</p>
+            </div>
+            <div class="feature">
                 <span class="feature-icon">&#x26A1;</span>
-                <h3>MONAI-Powered Augmentation</h3>
-                <p>3D spatial transforms — random affine, elastic deformation, intensity shifts — with medical imaging best practices.</p>
+                <h3>Operating Point Controllability</h3>
+                <p>Two deployment modes: balanced screening (&tau;=0.41, F1=0.9365) and high-sensitivity triage (&tau;=0.38, Recall=0.9524). Configurable at inference time.</p>
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">&#x1F504;</span>
-                <h3>Out-of-Fold Stacking</h3>
-                <p>Patient-level stratified k-fold ensures no data leakage while generating diverse meta-learner training signals.</p>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">&#x1F3AF;</span>
-                <h3>Tunable Clinical Thresholds</h3>
-                <p>Sensitivity–specificity trade-off controllable at inference time for different clinical screening scenarios.</p>
+            <div class="feature">
+                <span class="feature-icon">&#x1F4CA;</span>
+                <h3>Statistical Rigor</h3>
+                <p>1000-iteration bootstrap CIs, paired t-tests, nested CV for meta-learner evaluation, and forensic leakage tests with shuffled-label XGBoost baseline.</p>
             </div>
         </div>
     </section>
 
-    <!-- Tech Stack -->
-    <section class="tech-stack">
-        <div class="reveal">
-            <span class="section-label">Technology</span>
-            <h2 class="section-title">Powered by Modern Medical AI</h2>
-            <p class="section-desc">
-                Standing on the shoulders of state-of-the-art frameworks and libraries purpose-built for medical image analysis.
-            </p>
+    <!-- Ablation -->
+    <section class="ablation" id="ablation">
+        <div class="section-header reveal">
+            <div class="section-tag">Ablation Studies</div>
+            <h2 class="section-heading">Design Decisions Validated by Controlled Experiments</h2>
         </div>
-        <div class="tech-pills reveal">
-            <span class="tech-pill">PyTorch</span>
-            <span class="tech-pill">MONAI</span>
-            <span class="tech-pill">SimpleITK</span>
-            <span class="tech-pill">torchvision</span>
-            <span class="tech-pill">scikit-learn</span>
-            <span class="tech-pill">MedicalNet</span>
-            <span class="tech-pill">Swin Transformer</span>
-            <span class="tech-pill">NIfTI Format</span>
-            <span class="tech-pill">BraTS 2018</span>
-            <span class="tech-pill">5-Fold CV</span>
-            <span class="tech-pill">Grad-CAM</span>
-            <span class="tech-pill">XGBoost</span>
-            <span class="tech-pill">Platt Scaling</span>
-            <span class="tech-pill">Logistic Regression</span>
-            <span class="tech-pill">YAML Config</span>
+        <div class="ablation-cards reveal">
+            <div class="ablation-card">
+                <h3>Table 4: Entropy vs. Random Slice Selection (MIL)</h3>
+                <p class="ablation-card-desc">
+                    Entropy-based selection (top-k slices with highest Shannon entropy) vs. random selection for DualStreamMIL-3D. Entropy: AUC 0.7990 &plusmn; 0.0909, F1 0.8822 &plusmn; 0.0132, FN 1.8. Random: AUC 0.7310 &plusmn; 0.0500, F1 0.8485 &plusmn; 0.0200, FN 3.2.
+                </p>
+                <div class="ablation-result">
+                    <span class="improvement">+9.3%</span>
+                    <span class="context">Relative AUC gain (0.7990 vs 0.7310) &bull; FN reduced 44% (1.8 vs 3.2)</span>
+                </div>
+            </div>
+            <div class="ablation-card">
+                <h3>Table 5: Basic vs. Enhanced Meta-Learner (Nested CV)</h3>
+                <p class="ablation-card-desc">
+                    Enhanced meta-learner adds probability statistics (mean, std, min, max, range), inter-model margins, entropy, argmax indicators. Result: FN reduced (2.8 vs 3.4) but FP doubled (7.8 vs 3.4). Recall: 0.933 vs 0.919, but F1: 0.881 vs 0.920.
+                </p>
+                <div class="ablation-result">
+                    <span class="improvement">+0.039 F1</span>
+                    <span class="context">Basic meta-learner wins on balance (F1: 0.9195 vs 0.881)</span>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta-section">
+    <!-- Tech -->
+    <section class="tech">
+        <div class="section-header reveal" style="text-align: center;">
+            <div class="section-tag" style="justify-content: center;">Technology Stack</div>
+            <h2 class="section-heading" style="margin: 0 auto;">Powered by State-of-the-Art Medical AI</h2>
+        </div>
+        <div class="tech-cloud reveal">
+            <span class="tech-tag primary">PyTorch</span>
+            <span class="tech-tag primary">MONAI</span>
+            <span class="tech-tag primary">SimpleITK</span>
+            <span class="tech-tag primary">scikit-learn</span>
+            <span class="tech-tag">torchvision</span>
+            <span class="tech-tag">MedicalNet Pretraining</span>
+            <span class="tech-tag">Swin Transformer V1</span>
+            <span class="tech-tag">NIfTI Format</span>
+            <span class="tech-tag">BraTS 2018 Challenge</span>
+            <span class="tech-tag">Platt Scaling</span>
+            <span class="tech-tag">Logistic Regression (lbfgs)</span>
+            <span class="tech-tag">WeightedRandomSampler</span>
+            <span class="tech-tag">Grad-CAM 3D</span>
+            <span class="tech-tag">Bootstrap 1000-iter CI</span>
+            <span class="tech-tag">Nested 5-Fold CV</span>
+            <span class="tech-tag">Shannon Entropy Ranking</span>
+            <span class="tech-tag">StratifiedKFold</span>
+            <span class="tech-tag">joblib</span>
+            <span class="tech-tag">N4BiasFieldCorrection</span>
+        </div>
+    </section>
+
+    <!-- Summary -->
+    <section class="cta">
         <div class="reveal">
-            <span class="section-label">Get Started</span>
-            <h2 class="section-title">Reproduce Our Results or Run Inference on New Patients</h2>
-            <p class="section-desc">
-                Fully open-source pipeline with stage-by-stage preprocessing, training scripts, and CLI-based ensemble inference.
+            <div class="section-tag" style="justify-content: center;">Summary</div>
+            <h2 class="section-heading">Calibration-Aware Design for Clinically Deployable Brain Tumor Classification</h2>
+            <p class="section-subheading">
+                Our framework achieves AUC 0.9114 &plusmn; 0.0423 and F1 0.9195 &plusmn; 0.0324 with balanced error behavior, improved probability calibration (-16.8% Brier, -26.9% ECE), and flexible operating points (&tau;=0.41 balanced, &tau;=0.38 high-sensitivity) — representing significant advances toward clinical deployment.
             </p>
             <div class="cta-actions">
-                <a href="https://github.com" class="btn-primary">
+                <a href="https://github.com" class="btn btn-primary">
                     Clone Repository
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
-                <a href="#pipeline" class="btn-secondary">Read Documentation</a>
+                <a href="#setup" class="btn btn-outline">Read Full Results</a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <span class="footer-left">NeuroGrade &mdash; Multimodal Deep Learning Framework &copy; 2026</span>
+    <footer class="footer">
+        <span class="footer-left"><strong>NeuroGrade</strong> &mdash; Multimodal Deep Learning Framework for Brain Tumor Grade Classification &copy; 2026 &bull; All results: 5-fold CV mean &plusmn; std unless noted. Calibrated results on held-out n=86.</span>
         <ul class="footer-links">
-            <li><a href="#pipeline">Pipeline</a></li>
+            <li><a href="#setup">Setup</a></li>
             <li><a href="#architecture">Architecture</a></li>
             <li><a href="#results">Results</a></li>
+            <li><a href="#calibration">Calibration</a></li>
             <li><a href="https://github.com">GitHub</a></li>
         </ul>
     </footer>
 
-    <!-- Scroll Reveal Script -->
     <script>
         const reveals = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
@@ -1049,22 +1900,31 @@
                     entry.target.classList.add('visible');
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-
+        }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
         reveals.forEach(el => observer.observe(el));
 
-        // Parallax-like subtle nav hide on scroll
         let lastScroll = 0;
-        const nav = document.querySelector('nav');
+        const nav = document.querySelector('.nav');
         window.addEventListener('scroll', () => {
-            const current = window.scrollY;
-            if (current > lastScroll && current > 100) {
-                nav.style.transform = 'translateY(-100%)';
-            } else {
-                nav.style.transform = 'translateY(0)';
-            }
-            lastScroll = current;
+            const curr = window.scrollY;
+            nav.style.transform = (curr > lastScroll && curr > 120) ? 'translateY(-100%)' : 'translateY(0)';
+            lastScroll = curr;
         }, { passive: true });
+
+        // Counter animation for hero metrics
+        const animateCounters = () => {
+            document.querySelectorAll('.hero-metric-value').forEach(el => {
+                const text = el.textContent;
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(12px)';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 600 + Math.random() * 400);
+            });
+        };
+        animateCounters();
     </script>
 </body>
 </html>

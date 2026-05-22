@@ -1,0 +1,11 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+torch==2.5.1
+monai==1.4.0
+SimpleITK==2.4.1
+numpy==1.26.4
+scikit-learn==1.6.1
+joblib==1.4.2
+pandas==2.2.3
+pydantic==2.10.4
